@@ -1,10 +1,22 @@
+import { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button } from '../ui-components/inputs/Button';
 
 export function AppNavigation() {
+  const [file, setFile] = useState('');
+
   function handleSayHello() {
-    window.Main.sendMessage('Hello World');
-    console.log('Message sent! Check main process log in terminal.');
+    try {
+      const fs = window.api.fs;
+      setFile(
+        fs.readFileSync(
+          '/Users/zuccha/Development/personal/bazar/prettier.config.js',
+          'utf-8',
+        ),
+      );
+    } catch (error) {
+      setFile('error');
+    }
   }
 
   return (
@@ -13,8 +25,8 @@ export function AppNavigation() {
         src='https://www.vectorlogo.zone/logos/reactjs/reactjs-icon.svg'
         alt='ReactJS logo'
       />
-      <Text>A tool for hacking SMW.</Text>
       <Button onClick={handleSayHello}>Send message to main process</Button>
+      <Text>{file}</Text>
     </Container>
   );
 }

@@ -65,7 +65,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "name": "Electron starter",
+        "name": "Bazar",
         "executableName": "electron-starter",
         "icon": "assets/icon",
         "extraResource": [
@@ -97,7 +97,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Electron Starter"
+            "name": "Bazar"
           }
         },
         {
