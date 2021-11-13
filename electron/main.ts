@@ -21,10 +21,13 @@ function createWindow() {
       contextIsolation: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
+    show: false,
   });
 
+  mainWindow.maximize();
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  mainWindow.show();
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
