@@ -14,7 +14,7 @@ const PageByAppRouteName: Record<AppHomeRouteName, () => ReactElement> = {
   [AppHomeRouteName.ProjectCreationFromTemplate]: ProjectCreationFromTemplate,
 } as const;
 
-export default function HomePage(): ReactElement {
+export default function Home(): ReactElement {
   const appRoute = useSelector(selectAppHomeRoute);
   const Page = PageByAppRouteName[appRoute.name];
   return <Page />;

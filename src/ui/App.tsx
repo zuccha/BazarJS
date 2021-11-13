@@ -11,18 +11,18 @@ import { useSelector } from 'react-redux';
 import useActionCreator from '../hooks/useActionCreator';
 import { AppRouteName, selectAppRoute, setAppRoute } from '../store/navigation';
 import PageButton from './PageButton';
-import AboutPage from './pages/AboutPage';
-import HelpPage from './pages/HelpPage';
-import HomePage from './pages/HomePage';
-import ProjectPage from './pages/ProjectPage';
-import SettingsPage from './pages/SettingsPage';
+import About from './pages/About';
+import Help from './pages/Help';
+import Home from './pages/Home';
+import Project from './pages/Project';
+import Settings from './pages/Settings';
 
 const PageByAppRouteName: Record<AppRouteName, () => ReactElement> = {
-  [AppRouteName.About]: AboutPage,
-  [AppRouteName.Help]: HelpPage,
-  [AppRouteName.Home]: HomePage,
-  [AppRouteName.Project]: ProjectPage,
-  [AppRouteName.Settings]: SettingsPage,
+  [AppRouteName.About]: About,
+  [AppRouteName.Help]: Help,
+  [AppRouteName.Home]: Home,
+  [AppRouteName.Project]: Project,
+  [AppRouteName.Settings]: Settings,
 } as const;
 
 export default function AppNavigation(): ReactElement {
