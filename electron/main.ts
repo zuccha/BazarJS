@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 
 let mainWindow: BrowserWindow | null;
 
@@ -25,9 +25,11 @@ function createWindow() {
   });
 
   mainWindow.maximize();
+
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   mainWindow.show();
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -39,6 +41,10 @@ async function registerListeners() {
    */
   ipcMain.on('message', (_, message) => {
     console.log(message);
+  });
+
+  ipcMain.on('open-dialog', (event, options) => {
+    event.returnValue = dialog.showOpenDialogSync(options);
   });
 }
 

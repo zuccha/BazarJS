@@ -1,14 +1,15 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import {
+  contextBridge,
+  ipcRenderer,
+  dialog,
+  OpenDialogOptions,
+} from 'electron';
 import fs from 'fs';
 
 export const api = {
   /**
-   * Here you can expose functions to the renderer process so they can interact
-   * with the main (electron) side without security problems.
-   *
-   * The function below can accessed using `window.Main.sendMessage`.
+   * Log in the terminal.
    */
-
   log: (message: string) => {
     ipcRenderer.send('message', message);
   },
@@ -17,13 +18,23 @@ export const api = {
    * Provide an easier way to listen to events.
    */
   on: (channel: string, callback: Function) => {
-    ipcRenderer.on(channel, (_, data) => callback(data));
+    ipcRenderer.on(channel, (_, data) => {
+      console.log('listening to', channel);
+      callback(data);
+    });
   },
 
   /**
    * Expose filesystem library.
    */
   fs,
+
+  /**
+   * Native dialogs.
+   */
+  openDialog: (options: OpenDialogOptions): string[] | undefined => {
+    return ipcRenderer.sendSync('open-dialog', options);
+  },
 };
 
 contextBridge.exposeInMainWorld('api', api);
