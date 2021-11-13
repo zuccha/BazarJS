@@ -2,67 +2,65 @@ import {
   CopyIcon,
   DragHandleIcon,
   InfoIcon,
+  QuestionIcon,
   SettingsIcon,
 } from '@chakra-ui/icons';
 import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement, useState } from 'react';
-import IconButton from '../ui-atoms/input/IconButton';
-import Tooltip from '../ui-atoms/overlay/Tooltip';
+import PageButton from './PageButton';
+import AboutPage from './pages/AboutPage';
+import HelpPage from './pages/HelpPage';
+import HomePage from './pages/HomePage';
+import ProjectPage from './pages/ProjectPage';
+import SettingsPage from './pages/SettingsPage';
 
-enum Tab {
+enum Page {
+  About,
+  Help,
   Home,
   Project,
   Settings,
-  Info,
 }
 
-const ContentByTab: Record<Tab, () => ReactElement> = {
-  [Tab.Home]: () => <span>home</span>,
-  [Tab.Project]: () => <span>project</span>,
-  [Tab.Settings]: () => <span>settings</span>,
-  [Tab.Info]: () => <span>info</span>,
+const ContentByTab: Record<Page, () => ReactElement> = {
+  [Page.About]: AboutPage,
+  [Page.Help]: HelpPage,
+  [Page.Home]: HomePage,
+  [Page.Project]: ProjectPage,
+  [Page.Settings]: SettingsPage,
 } as const;
 
-interface TabButtonProps {
-  icon: ReactElement;
-  label: string;
-  onClick: () => void;
-}
-
-function TabButton({ icon, label, onClick }: TabButtonProps): ReactElement {
-  return (
-    <Tooltip label={label} placement='right'>
-      <IconButton label={label} icon={icon} onClick={onClick} />
-    </Tooltip>
-  );
-}
-
 export default function AppNavigation(): ReactElement {
-  const [tab, setTab] = useState<Tab>(Tab.Home);
-  const Content = ContentByTab[tab];
+  const [page, setPage] = useState<Page>(Page.Home);
+  const Content = ContentByTab[page];
   return (
     <Flex height='100%'>
       <VStack p='3' bg='app.bg2'>
-        <TabButton
+        <PageButton
           icon={<DragHandleIcon />}
           label='Home'
-          onClick={() => setTab(Tab.Home)}
+          onClick={() => setPage(Page.Home)}
         />
-        <TabButton
+        <PageButton
           icon={<CopyIcon />}
           label='Project'
-          onClick={() => setTab(Tab.Project)}
+          onClick={() => setPage(Page.Project)}
         />
-        <TabButton
+        <PageButton
           icon={<SettingsIcon />}
           label='Settings'
-          onClick={() => setTab(Tab.Settings)}
+          onClick={() => setPage(Page.Settings)}
         />
         <Flex flex={1} />
-        <TabButton
+        <PageButton
           icon={<InfoIcon />}
           label='About'
-          onClick={() => setTab(Tab.Info)}
+          onClick={() => setPage(Page.About)}
+        />
+        <PageButton
+          icon={<QuestionIcon />}
+          label='Help'
+          onClick={() => setPage(Page.Help)}
         />
       </VStack>
       <Flex flex={1} bg='app.bg3'>

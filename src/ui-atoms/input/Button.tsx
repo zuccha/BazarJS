@@ -2,28 +2,35 @@ import * as Chakra from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
 
-interface IconButtonProps {
-  icon: ReactElement;
+interface ButtonProps {
+  disabled?: boolean;
+  isFullWidth?: boolean;
   label: string;
   onClick: () => void;
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
 }
 
-export default function IconButton({
-  icon,
+export default function Button({
+  disabled = false,
+  isFullWidth = false,
   label,
   onClick,
   variant = 'solid',
-}: IconButtonProps): ReactElement {
+}: ButtonProps): ReactElement {
   const colorScheme = useColorScheme();
   return (
-    <Chakra.IconButton
+    <Chakra.Button
       aria-label={label}
+      borderRadius='0'
       colorScheme={colorScheme}
-      icon={icon}
+      disabled={disabled}
+      isFullWidth={isFullWidth}
       onClick={onClick}
-      size='lg'
+      py={1}
+      size='sm'
       variant={variant}
-    />
+    >
+      {label}
+    </Chakra.Button>
   );
 }
