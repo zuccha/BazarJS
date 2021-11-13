@@ -17,7 +17,7 @@ import HomePage from './pages/HomePage';
 import ProjectPage from './pages/ProjectPage';
 import SettingsPage from './pages/SettingsPage';
 
-const ContentByAppRouteName: Record<AppRouteName, () => ReactElement> = {
+const PageByAppRouteName: Record<AppRouteName, () => ReactElement> = {
   [AppRouteName.About]: AboutPage,
   [AppRouteName.Help]: HelpPage,
   [AppRouteName.Home]: HomePage,
@@ -28,7 +28,7 @@ const ContentByAppRouteName: Record<AppRouteName, () => ReactElement> = {
 export default function AppNavigation(): ReactElement {
   const appRoute = useSelector(selectAppRoute);
   const dispatchSetAppRoute = useActionCreator(setAppRoute);
-  const Content = ContentByAppRouteName[appRoute.name];
+  const Page = PageByAppRouteName[appRoute.name];
 
   return (
     <Flex height='100%'>
@@ -61,7 +61,7 @@ export default function AppNavigation(): ReactElement {
         />
       </VStack>
       <Flex flex={1} bg='app.bg3'>
-        <Content />
+        <Page />
       </Flex>
     </Flex>
   );
