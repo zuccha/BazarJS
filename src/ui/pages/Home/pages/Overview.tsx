@@ -1,9 +1,16 @@
 import { Heading, VStack } from '@chakra-ui/layout';
 import { Center } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import useActionCreator from '../../../../hooks/useActionCreator';
+import {
+  AppHomeRouteName,
+  setAppHomeRoute,
+} from '../../../../store/navigation';
 import Button from '../../../../ui-atoms/input/Button';
 
 export default function Overview(): ReactElement {
+  const dispatchSetAppHomeRoute = useActionCreator(setAppHomeRoute);
+
   return (
     <Center flex={1}>
       <VStack minW={200} alignItems='flex-start' spacing={8}>
@@ -16,7 +23,15 @@ export default function Overview(): ReactElement {
           </Heading>
         </VStack>
         <VStack spacing={2} minW={200} alignItems='flex-start'>
-          <Button label='New' onClick={() => {}} isFullWidth />
+          <Button
+            label='New'
+            onClick={() => {
+              dispatchSetAppHomeRoute({
+                name: AppHomeRouteName.ProjectCreationFromSource,
+              });
+            }}
+            isFullWidth
+          />
           <Button label='Open' onClick={() => {}} isFullWidth />
         </VStack>
 
