@@ -1,4 +1,15 @@
+import { ChakraProvider } from '@chakra-ui/react';
+import { ReactElement } from 'react';
 import ReactDOM from 'react-dom';
-import { App } from './ui/App';
+import theme from './theme';
+import App from './ui/App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+export function AppWithProviders(): ReactElement {
+  return (
+    <ChakraProvider theme={theme}>
+      <App />
+    </ChakraProvider>
+  );
+}
+
+ReactDOM.render(<AppWithProviders />, document.getElementById('root'));
