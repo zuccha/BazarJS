@@ -13,6 +13,7 @@ interface BrowserInputProps {
   isDisabled?: boolean;
   isInvalid?: boolean;
   mode: 'file' | 'directory';
+  onBlur?: () => void;
   onChange: (value: string) => void;
   placeholder: string;
   value: string;
@@ -23,6 +24,7 @@ export default function BrowserInput({
   isDisabled,
   isInvalid,
   mode,
+  onBlur,
   onChange,
   placeholder,
   value,
@@ -46,6 +48,7 @@ export default function BrowserInput({
         <TextInput
           isDisabled={isDisabled}
           isInvalid={isInvalid}
+          onBlur={onBlur}
           onChange={onChange}
           placeholder={placeholder}
           value={value}

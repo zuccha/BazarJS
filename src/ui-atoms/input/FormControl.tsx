@@ -1,8 +1,12 @@
 import * as Chakra from '@chakra-ui/react';
 import { QuestionIcon, WarningIcon } from '@chakra-ui/icons';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useCallback, useMemo, useState } from 'react';
 import Tooltip from '../overlay/Tooltip';
 import { ErrorReport } from '../../utils/ErrorReport';
+
+/**
+ * FormControl
+ */
 
 interface FormControlProps {
   children: ReactNode;
@@ -68,4 +72,92 @@ export default function FormControl({
       )}
     </Chakra.FormControl>
   );
+}
+
+/**
+ * useFormField
+ */
+
+interface FormField<T> {
+  control: {
+    errorReport: ErrorReport | undefined;
+    infoMessage: string | undefined;
+    isInvalid: boolean;
+    isRequired: boolean;
+    label: string;
+  };
+  handleBlur: () => void;
+  handleChange: (value: T) => void;
+  isValid: boolean;
+  value: T;
+}
+
+export function useFormField<T>({
+  infoMessage,
+  initialValue,
+  isRequired = false,
+  label,
+  onValidate = () => undefined,
+}: {
+  infoMessage?: string;
+  initialValue: T;
+  isRequired?: boolean;
+  label: string;
+  onValidate?: (value: T) => ErrorReport | undefined;
+}): FormField<T> {
+  const [value, setValue] = useState(initialValue);
+  const [isDirty, setIsDirty] = useState(false);
+  const [errorReport, setErrorReport] = useState<ErrorReport | undefined>();
+
+  const handleChange = useCallback(
+    (newValue: T) => {
+      const newErrorReport = onValidate(newValue);
+      setErrorReport(newErrorReport);
+      setIsDirty(true);
+      setValue(newValue);
+    },
+    [onValidate],
+  );
+
+  const handleBlur = useCallback(() => {
+    const newErrorReport = onValidate(value);
+    setErrorReport(newErrorReport);
+    setIsDirty(true);
+  }, [value]);
+
+  const isValid = useMemo(() => {
+    return isDirty ? !errorReport : !onValidate(initialValue);
+  }, [isDirty, errorReport, initialValue, onValidate]);
+
+  return {
+    control: {
+      errorReport,
+      infoMessage,
+      isInvalid: Boolean(errorReport) && isDirty,
+      isRequired,
+      label,
+    },
+    handleBlur,
+    handleChange,
+    isValid,
+    value,
+  };
+}
+
+/**
+ * useForm
+ */
+
+interface Form {
+  isValid: boolean;
+}
+
+export function useForm({ fields }: { fields: FormField<any>[] }): Form {
+  const isValid = useMemo(() => {
+    return fields.every((field) => !field.control.isRequired || field.isValid);
+  }, [fields]);
+
+  return {
+    isValid,
+  };
 }

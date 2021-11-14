@@ -1,5 +1,5 @@
 import { Center, Heading, HStack, Text, VStack } from '@chakra-ui/react';
-import { ReactElement, useState } from 'react';
+import { ReactElement } from 'react';
 import useActionCreator from '../../../../hooks/useActionCreator';
 import {
   AppHomeRouteName,
@@ -7,14 +7,50 @@ import {
 } from '../../../../store/navigation';
 import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
 import Button from '../../../../ui-atoms/input/Button';
-import FormControl from '../../../../ui-atoms/input/FormControl';
+import FormControl, {
+  useForm,
+  useFormField,
+} from '../../../../ui-atoms/input/FormControl';
 import TextInput from '../../../../ui-atoms/input/TextInput';
 import { $ErrorReport } from '../../../../utils/ErrorReport';
 
 export default function ProjectCreationFromSource(): ReactElement {
-  const [name, setName] = useState('');
-  const [romFilePath, setRomFilePath] = useState('');
-  const [destinationDirPath, setDestinationDirPath] = useState('');
+  const nameField = useFormField({
+    infoMessage: 'This will be the name fo the project directory.',
+    initialValue: '',
+    isRequired: true,
+    label: 'Project name',
+    onValidate: (value: string) =>
+      value.length === 0
+        ? $ErrorReport.make('This field cannot be empty')
+        : undefined,
+  });
+
+  const locationDirPathField = useFormField({
+    infoMessage: 'The project will be created in this directory.',
+    initialValue: '',
+    isRequired: true,
+    label: 'Destination directory',
+    onValidate: (value: string) =>
+      value.length === 0
+        ? $ErrorReport.make('This field cannot be empty')
+        : undefined,
+  });
+
+  const romFilePathField = useFormField({
+    infoMessage: 'ROM used for the project (a copy will be made).',
+    initialValue: '',
+    isRequired: true,
+    label: 'ROM file',
+    onValidate: (value: string) =>
+      value.length === 0
+        ? $ErrorReport.make('This field cannot be empty')
+        : undefined,
+  });
+
+  const form = useForm({
+    fields: [nameField, romFilePathField, locationDirPathField],
+  });
 
   const dispatchSetAppHomeRoute = useActionCreator(setAppHomeRoute);
 
@@ -33,43 +69,33 @@ export default function ProjectCreationFromSource(): ReactElement {
         </VStack>
 
         <VStack width='100%' spacing={4}>
-          <FormControl
-            infoMessage='The name of the project'
-            isRequired
-            label='Project name'
-          >
+          <FormControl {...nameField.control}>
             <TextInput
-              onChange={setName}
-              placeholder='Project name'
-              value={name}
+              onBlur={nameField.handleBlur}
+              onChange={nameField.handleChange}
+              placeholder={nameField.control.label}
+              value={nameField.value}
             />
           </FormControl>
 
-          <FormControl
-            errorReport={$ErrorReport.make('Blabla', ['asd', 'dsa'])}
-            infoMessage='This ROM will be used a base ROM'
-            isRequired
-            label='ROM file'
-          >
+          <FormControl {...locationDirPathField.control}>
+            <BrowserInput
+              mode='directory'
+              onBlur={locationDirPathField.handleBlur}
+              onChange={locationDirPathField.handleChange}
+              placeholder={locationDirPathField.control.label}
+              value={locationDirPathField.value}
+            />
+          </FormControl>
+
+          <FormControl {...romFilePathField.control}>
             <BrowserInput
               filters={[{ name: 'ROM', extensions: ['smc'] }]}
               mode='file'
-              onChange={setRomFilePath}
-              placeholder='ROM file path'
-              value={romFilePath}
-            />
-          </FormControl>
-
-          <FormControl
-            infoMessage='The project will be created in this directory'
-            isRequired
-            label='Destination directory'
-          >
-            <BrowserInput
-              mode='directory'
-              onChange={setDestinationDirPath}
-              placeholder='Project directory'
-              value={destinationDirPath}
+              onBlur={romFilePathField.handleBlur}
+              onChange={romFilePathField.handleChange}
+              placeholder={romFilePathField.control.label}
+              value={romFilePathField.value}
             />
           </FormControl>
         </VStack>
@@ -82,7 +108,11 @@ export default function ProjectCreationFromSource(): ReactElement {
             }
             variant='outline'
           />
-          <Button label='Create' onClick={() => {}} />
+          <Button
+            label='Create'
+            onClick={() => {}}
+            isDisabled={!form.isValid}
+          />
         </HStack>
       </VStack>
     </Center>
