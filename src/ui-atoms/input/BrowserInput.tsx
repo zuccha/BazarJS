@@ -20,8 +20,8 @@ interface BrowserInputProps {
 
 export default function BrowserInput({
   filters,
-  isDisabled = false,
-  isInvalid = false,
+  isDisabled,
+  isInvalid,
   mode,
   onChange,
   placeholder,
@@ -53,7 +53,7 @@ export default function BrowserInput({
       </Chakra.Flex>
       <Button
         label='...'
-        disabled={isDisabled}
+        isDisabled={isDisabled}
         onClick={handleBrowse}
         variant='outline'
       />

@@ -11,8 +11,8 @@ interface TextInputProps {
 }
 
 export default function TextInput({
-  isDisabled = false,
-  isInvalid = false,
+  isDisabled,
+  isInvalid,
   onChange,
   placeholder,
   value,

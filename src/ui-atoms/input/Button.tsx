@@ -3,7 +3,7 @@ import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
 
 interface ButtonProps {
-  disabled?: boolean;
+  isDisabled?: boolean;
   isFullWidth?: boolean;
   label: string;
   onClick: () => void;
@@ -11,7 +11,7 @@ interface ButtonProps {
 }
 
 export default function Button({
-  disabled = false,
+  isDisabled,
   isFullWidth = false,
   label,
   onClick,
@@ -23,7 +23,7 @@ export default function Button({
       aria-label={label}
       borderRadius='0'
       colorScheme={colorScheme}
-      disabled={disabled}
+      disabled={isDisabled}
       isFullWidth={isFullWidth}
       onClick={onClick}
       py={1}
