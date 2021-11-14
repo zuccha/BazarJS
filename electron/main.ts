@@ -39,11 +39,11 @@ async function registerListeners() {
   /**
    * This comes from bridge integration, check bridge.ts
    */
-  ipcMain.on('message', (_, message) => {
+  ipcMain.on('Console.log', (_, message) => {
     console.log(message);
   });
 
-  ipcMain.on('open-dialog', (event, options) => {
+  ipcMain.on('Dialog.open', (event, options) => {
     event.returnValue = dialog.showOpenDialogSync(options);
   });
 }

@@ -3,6 +3,8 @@ import { ReactElement, useCallback } from 'react';
 import Button from './Button';
 import TextInput from './TextInput';
 
+const { $Dialog } = window.api;
+
 const propertiesByMode = {
   file: 'openFile',
   directory: 'openDirectory',
@@ -30,7 +32,7 @@ export default function BrowserInput({
   value,
 }: BrowserInputProps): ReactElement {
   const handleBrowse = useCallback(() => {
-    const paths = window.api.openDialog({
+    const paths = $Dialog.open({
       title: mode === 'file' ? 'Select a file' : 'Select a directory',
       defaultPath: value,
       properties: [propertiesByMode[mode]],

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { $ErrorReport, ErrorReport } from './ErrorReport';
+import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 
 export const $FileSystem = {
   join: path.join,

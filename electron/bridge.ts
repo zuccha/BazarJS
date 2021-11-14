@@ -1,35 +1,14 @@
-import { contextBridge, ipcRenderer, OpenDialogOptions } from 'electron';
-import { $FileSystem } from '../src/utils/FileSystem';
+import { contextBridge } from 'electron';
+import { $Console } from '../src/utils-electron/Console';
+import { $Dialog } from '../src/utils-electron/Dialog';
+import { $FileSystem } from '../src/utils-electron/FileSystem';
+import { $Settings } from '../src/utils-electron/Settings';
 
 export const api = {
-  /**
-   * Log in the terminal.
-   */
-  log: (message: string) => {
-    ipcRenderer.send('message', message);
-  },
-
-  /**
-   * Provide an easier way to listen to events.
-   */
-  on: (channel: string, callback: Function) => {
-    ipcRenderer.on(channel, (_, data) => {
-      console.log('listening to', channel);
-      callback(data);
-    });
-  },
-
-  /**
-   * Expose filesystem library.
-   */
+  $Console,
+  $Dialog,
   $FileSystem,
-
-  /**
-   * Native dialogs.
-   */
-  openDialog: (options: OpenDialogOptions): string[] | undefined => {
-    return ipcRenderer.sendSync('open-dialog', options);
-  },
+  $Settings,
 };
 
 contextBridge.exposeInMainWorld('api', api);

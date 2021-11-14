@@ -12,13 +12,14 @@ import FormControl, {
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
 import TextInput from '../../../../ui-atoms/input/TextInput';
+import { SettingString } from '../../../../utils-electron/Settings.types';
 
-const $FileSystem = window.api.$FileSystem;
+const { $FileSystem, $Settings } = window.api;
 
 export default function ProjectCreationFromSource(): ReactElement {
   const nameField = useFormField({
     infoMessage: 'This will be the name fo the project directory.',
-    initialValue: '',
+    initialValue: 'MyProject',
     isRequired: true,
     label: 'Project name',
     onValidate: $FileSystem.validateIsValidName,
@@ -26,7 +27,10 @@ export default function ProjectCreationFromSource(): ReactElement {
 
   const locationDirPathField = useFormField({
     infoMessage: 'The project will be created in this directory.',
-    initialValue: '',
+    initialValue: $Settings.getString(
+      SettingString.NewProjectDefaultLocationDirPath,
+      '',
+    ),
     isRequired: true,
     label: 'Destination directory',
     onValidate: $FileSystem.validateExistsDir,
@@ -34,7 +38,10 @@ export default function ProjectCreationFromSource(): ReactElement {
 
   const romFilePathField = useFormField({
     infoMessage: 'ROM used for the project (a copy will be made).',
-    initialValue: '',
+    initialValue: $Settings.getString(
+      SettingString.NewProjectDefaultRomFilePath,
+      '',
+    ),
     isRequired: true,
     label: 'ROM file',
     onValidate: (value: string) =>
@@ -104,7 +111,16 @@ export default function ProjectCreationFromSource(): ReactElement {
           />
           <Button
             label='Create'
-            onClick={() => {}}
+            onClick={() => {
+              $Settings.setString(
+                SettingString.NewProjectDefaultLocationDirPath,
+                locationDirPathField.value,
+              );
+              $Settings.setString(
+                SettingString.NewProjectDefaultRomFilePath,
+                romFilePathField.value,
+              );
+            }}
             isDisabled={!form.isValid}
           />
         </HStack>
