@@ -12,7 +12,7 @@ export const $ErrorReport = {
       others,
       all: () => [main, ...others],
       extend: (message: string) =>
-        $ErrorReport.make(main, [...others, message]),
+        $ErrorReport.make(message, [main, ...others]),
     };
   },
 };
