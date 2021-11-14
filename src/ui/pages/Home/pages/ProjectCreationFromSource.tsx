@@ -111,16 +111,7 @@ export default function ProjectCreationFromSource(): ReactElement {
           />
           <Button
             label='Create'
-            onClick={() => {
-              $Settings.setString(
-                SettingString.NewProjectDefaultLocationDirPath,
-                locationDirPathField.value,
-              );
-              $Settings.setString(
-                SettingString.NewProjectDefaultRomFilePath,
-                romFilePathField.value,
-              );
-            }}
+            onClick={() => {}}
             isDisabled={!form.isValid}
           />
         </HStack>
