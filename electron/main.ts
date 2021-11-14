@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import Store from 'electron-store';
 
 let mainWindow: BrowserWindow | null;
 
@@ -63,3 +64,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+Store.initRenderer();
