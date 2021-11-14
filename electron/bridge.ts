@@ -1,10 +1,5 @@
-import {
-  contextBridge,
-  ipcRenderer,
-  dialog,
-  OpenDialogOptions,
-} from 'electron';
-import fs from 'fs';
+import { contextBridge, ipcRenderer, OpenDialogOptions } from 'electron';
+import { $FileSystem } from '../src/utils/FileSystem';
 
 export const api = {
   /**
@@ -27,7 +22,7 @@ export const api = {
   /**
    * Expose filesystem library.
    */
-  fs,
+  $FileSystem,
 
   /**
    * Native dialogs.
