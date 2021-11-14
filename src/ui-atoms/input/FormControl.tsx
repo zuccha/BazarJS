@@ -123,7 +123,7 @@ export function useFormField<T>({
     const newErrorReport = onValidate(value);
     setErrorReport(newErrorReport);
     setIsDirty(true);
-  }, [value]);
+  }, [onValidate, value]);
 
   const isValid = useMemo(() => {
     return isDirty ? !errorReport : !onValidate(initialValue);

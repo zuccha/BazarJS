@@ -12,7 +12,8 @@ import FormControl, {
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
 import TextInput from '../../../../ui-atoms/input/TextInput';
-import { $ErrorReport } from '../../../../utils/ErrorReport';
+
+const $FileSystem = window.api.$FileSystem;
 
 export default function ProjectCreationFromSource(): ReactElement {
   const nameField = useFormField({
@@ -20,10 +21,7 @@ export default function ProjectCreationFromSource(): ReactElement {
     initialValue: '',
     isRequired: true,
     label: 'Project name',
-    onValidate: (value: string) =>
-      value.length === 0
-        ? $ErrorReport.make('This field cannot be empty')
-        : undefined,
+    onValidate: $FileSystem.validateIsValidName,
   });
 
   const locationDirPathField = useFormField({
@@ -31,10 +29,7 @@ export default function ProjectCreationFromSource(): ReactElement {
     initialValue: '',
     isRequired: true,
     label: 'Destination directory',
-    onValidate: (value: string) =>
-      value.length === 0
-        ? $ErrorReport.make('This field cannot be empty')
-        : undefined,
+    onValidate: $FileSystem.validateExistsDir,
   });
 
   const romFilePathField = useFormField({
@@ -43,9 +38,8 @@ export default function ProjectCreationFromSource(): ReactElement {
     isRequired: true,
     label: 'ROM file',
     onValidate: (value: string) =>
-      value.length === 0
-        ? $ErrorReport.make('This field cannot be empty')
-        : undefined,
+      $FileSystem.validateExistsFile(value) ||
+      $FileSystem.validateHasExtension(value, '.smc'),
   });
 
   const form = useForm({
