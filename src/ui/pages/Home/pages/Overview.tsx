@@ -1,7 +1,7 @@
 import { Heading, VStack } from '@chakra-ui/layout';
 import { Center } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import useActionCreator from '../../../../hooks/useActionCreator';
+import { useDispatch } from 'react-redux';
 import {
   AppHomeRouteName,
   setAppHomeRoute,
@@ -9,7 +9,7 @@ import {
 import Button from '../../../../ui-atoms/input/Button';
 
 export default function Overview(): ReactElement {
-  const dispatchSetAppHomeRoute = useActionCreator(setAppHomeRoute);
+  const dispatch = useDispatch();
 
   return (
     <Center flex={1}>
@@ -26,9 +26,11 @@ export default function Overview(): ReactElement {
           <Button
             label='New'
             onClick={() => {
-              dispatchSetAppHomeRoute({
-                name: AppHomeRouteName.ProjectCreationFromSource,
-              });
+              dispatch(
+                setAppHomeRoute({
+                  name: AppHomeRouteName.ProjectCreationFromSource,
+                }),
+              );
             }}
             isFullWidth
           />

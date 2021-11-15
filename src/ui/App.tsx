@@ -7,8 +7,7 @@ import {
 } from '@chakra-ui/icons';
 import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import { useSelector } from 'react-redux';
-import useActionCreator from '../hooks/useActionCreator';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppRouteName, selectAppRoute, setAppRoute } from '../store/navigation';
 import PageButton from './PageButton';
 import About from './pages/About';
@@ -27,7 +26,7 @@ const PageByAppRouteName: Record<AppRouteName, () => ReactElement> = {
 
 export default function AppNavigation(): ReactElement {
   const appRoute = useSelector(selectAppRoute);
-  const dispatchSetAppRoute = useActionCreator(setAppRoute);
+  const dispatch = useDispatch();
   const Page = PageByAppRouteName[appRoute.name];
 
   return (
@@ -36,28 +35,28 @@ export default function AppNavigation(): ReactElement {
         <PageButton
           icon={<DragHandleIcon />}
           label='Home'
-          onClick={() => dispatchSetAppRoute({ name: AppRouteName.Home })}
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.Home }))}
         />
         <PageButton
           icon={<CopyIcon />}
           label='Project'
-          onClick={() => dispatchSetAppRoute({ name: AppRouteName.Project })}
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.Project }))}
         />
         <PageButton
           icon={<SettingsIcon />}
           label='Settings'
-          onClick={() => dispatchSetAppRoute({ name: AppRouteName.Settings })}
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.Settings }))}
         />
         <Flex flex={1} />
         <PageButton
           icon={<InfoIcon />}
           label='About'
-          onClick={() => dispatchSetAppRoute({ name: AppRouteName.About })}
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.About }))}
         />
         <PageButton
           icon={<QuestionIcon />}
           label='Help'
-          onClick={() => dispatchSetAppRoute({ name: AppRouteName.Help })}
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.Help }))}
         />
       </VStack>
       <Flex flex={1} bg='app.bg3'>
