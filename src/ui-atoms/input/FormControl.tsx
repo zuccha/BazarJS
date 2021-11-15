@@ -1,8 +1,8 @@
 import * as Chakra from '@chakra-ui/react';
-import { QuestionIcon, WarningIcon } from '@chakra-ui/icons';
 import { ReactElement, ReactNode, useCallback, useMemo, useState } from 'react';
-import Tooltip from '../overlay/Tooltip';
 import { ErrorReport } from '../../utils/ErrorReport';
+import FormError from './FormError';
+import FormLabel from './FormLabel';
 
 /**
  * FormControl
@@ -16,16 +16,6 @@ interface FormControlProps {
   isInvalid?: boolean;
   isRequired?: boolean;
   label: string;
-}
-
-function ErrorTooltipLabel({ messages }: { messages: string[] }): ReactElement {
-  return (
-    <Chakra.VStack alignItems='flex-start' spacing={1}>
-      {messages.map((message) => (
-        <Chakra.Text key={message}>{message}</Chakra.Text>
-      ))}
-    </Chakra.VStack>
-  );
 }
 
 export default function FormControl({
@@ -44,32 +34,9 @@ export default function FormControl({
       isDisabled={isDisabled}
       isInvalid={isInvalid}
     >
-      <Chakra.FormLabel display='flex' flexDirection='row' alignItems='center'>
-        <Chakra.Text>{label}</Chakra.Text>
-        {infoMessage && (
-          <Tooltip label={infoMessage} placement='top'>
-            <QuestionIcon w={3} h={3} ml={1} color='app.info' />
-          </Tooltip>
-        )}
-      </Chakra.FormLabel>
+      <FormLabel label={label} infoMessage={infoMessage} />
       {children}
-      {errorReport && (
-        <Chakra.FormErrorMessage
-          display='flex'
-          flexDirection='row'
-          alignItems='center'
-        >
-          <Chakra.Text>{errorReport.main}</Chakra.Text>
-          {errorReport.others.length > 0 && (
-            <Tooltip
-              label={<ErrorTooltipLabel messages={errorReport.all()} />}
-              placement='top'
-            >
-              <WarningIcon w={3} h={3} ml={1} />
-            </Tooltip>
-          )}
-        </Chakra.FormErrorMessage>
-      )}
+      {errorReport && <FormError errorReport={errorReport} />}
     </Chakra.FormControl>
   );
 }
@@ -149,15 +116,33 @@ export function useFormField<T>({
  */
 
 interface Form {
+  error: ErrorReport | undefined;
+  handleSubmit: () => ErrorReport | undefined;
   isValid: boolean;
 }
 
-export function useForm({ fields }: { fields: FormField<any>[] }): Form {
+export function useForm({
+  fields,
+  onSubmit,
+}: {
+  fields: FormField<any>[];
+  onSubmit: () => ErrorReport | undefined;
+}): Form {
+  const [error, setError] = useState<ErrorReport | undefined>();
+
   const isValid = useMemo(() => {
     return fields.every((field) => !field.control.isRequired || field.isValid);
   }, [fields]);
 
+  const handleSubmit = useCallback(() => {
+    const maybeError = onSubmit();
+    setError(maybeError);
+    return maybeError;
+  }, [onSubmit]);
+
   return {
+    error,
+    handleSubmit,
     isValid,
   };
 }
