@@ -1,16 +1,21 @@
-import { Center, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import useActionCreator from '../../../../hooks/useActionCreator';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../../store';
 import {
   AppHomeRouteName,
+  AppRouteName,
   setAppHomeRoute,
+  setAppRoute,
 } from '../../../../store/navigation';
+import { createProjectFromSource } from '../../../../store/project';
 import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
 import Button from '../../../../ui-atoms/input/Button';
 import FormControl, {
   useForm,
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
+import FormError from '../../../../ui-atoms/input/FormError';
 import TextInput from '../../../../ui-atoms/input/TextInput';
 import { SettingString } from '../../../../utils-electron/Settings.types';
 
@@ -49,11 +54,20 @@ export default function ProjectCreationFromSource(): ReactElement {
       $FileSystem.validateHasExtension(value, '.smc'),
   });
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const form = useForm({
     fields: [nameField, romFilePathField, locationDirPathField],
+    onSubmit: () => {
+      return dispatch(
+        createProjectFromSource({
+          name: nameField.value,
+          romFilePath: romFilePathField.value,
+          locationDirPath: locationDirPathField.value,
+        }),
+      );
+    },
   });
-
-  const dispatchSetAppHomeRoute = useActionCreator(setAppHomeRoute);
 
   return (
     <Center flex={1} p={10}>
@@ -102,16 +116,24 @@ export default function ProjectCreationFromSource(): ReactElement {
         </VStack>
 
         <HStack width='100%' justifyContent='flex-end'>
+          {form.error && <FormError errorReport={form.error} />}
+          <Flex flex={1} />
           <Button
             label='Cancel'
             onClick={() =>
-              dispatchSetAppHomeRoute({ name: AppHomeRouteName.Overview })
+              dispatch(setAppHomeRoute({ name: AppHomeRouteName.Overview }))
             }
             variant='outline'
           />
           <Button
             label='Create'
-            onClick={() => {}}
+            onClick={() => {
+              const maybeError = form.handleSubmit();
+              if (!maybeError) {
+                dispatch(setAppRoute({ name: AppRouteName.Project }));
+                dispatch(setAppHomeRoute({ name: AppHomeRouteName.Overview }));
+              }
+            }}
             isDisabled={!form.isValid}
           />
         </HStack>
