@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import * as navigation from './navigation';
+import * as project from './project';
 
 const store = configureStore({
   reducer: {
     navigation: navigation.reducer,
+    project: project.reducer,
   },
 });
 
