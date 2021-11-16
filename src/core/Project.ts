@@ -78,6 +78,7 @@ export const $Project = {
     }
 
     if ((error = $Project.saveConfig(directory, { name }))) {
+      $FileSystem.removePath(directory);
       const errorMessage = `${errorPrefix}: failed to save config`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
