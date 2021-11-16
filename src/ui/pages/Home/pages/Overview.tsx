@@ -57,7 +57,7 @@ export default function Overview(): ReactElement {
             A tool for hacking Super Mario World
           </Heading>
         </VStack>
-        <VStack spacing={2} minW={200} alignItems='flex-start'>
+        <VStack spacing={2} minW={200} alignItems='flex-start' width='100%'>
           <Button
             label='New'
             onClick={handleCreateProjectFromSource}
