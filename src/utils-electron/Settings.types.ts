@@ -10,3 +10,10 @@ export enum SettingNumber {
 export enum SettingBoolean {
   AskConfirmationBeforeApplyingPatch = 'AskConfirmationBeforeApplyingPatch',
 }
+
+export type SettingsStore = {
+  [SettingString.NewProjectDefaultLocationDirPath]: string;
+  [SettingString.NewProjectDefaultRomFilePath]: string;
+  [SettingNumber.RecentProjectsMaxCount]: number;
+  [SettingBoolean.AskConfirmationBeforeApplyingPatch]: boolean;
+};

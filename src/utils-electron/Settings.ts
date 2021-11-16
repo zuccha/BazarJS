@@ -1,22 +1,24 @@
 import Store from 'electron-store';
-import { SettingBoolean, SettingNumber, SettingString } from './Settings.types';
+import {
+  SettingBoolean,
+  SettingNumber,
+  SettingsStore,
+  SettingString,
+} from './Settings.types';
 
-const store = new Store();
+const store = new Store<SettingsStore>();
 
 export const $Settings = {
   getBoolean: (key: SettingBoolean, defaultValue: boolean = false): boolean => {
-    const value = store.get(key);
-    return typeof value === 'boolean' ? value : defaultValue;
+    return store.get(key, defaultValue);
   },
 
   getNumber: (key: SettingNumber, defaultValue: number = 0): number => {
-    const value = store.get(key);
-    return typeof value === 'number' ? value : defaultValue;
+    return store.get(key, defaultValue);
   },
 
   getString: (key: SettingString, defaultValue: string = ''): string => {
-    const value = store.get(key);
-    return typeof value === 'string' ? value : defaultValue;
+    return store.get(key, defaultValue);
   },
 
   setBoolean: (key: SettingBoolean, value: boolean): void => {
