@@ -18,7 +18,10 @@ import FormControl, {
 import FormError from '../../../../ui-atoms/input/FormError';
 import TextInput from '../../../../ui-atoms/input/TextInput';
 import { SettingString } from '../../../../utils-electron/Settings.types';
-import { getSettingString } from '../../../../store/slices/settings';
+import {
+  getSettingString,
+  prioritizeRecentProject,
+} from '../../../../store/slices/settings';
 
 const { $FileSystem } = window.api;
 
@@ -60,13 +63,21 @@ export default function ProjectCreationFromSource(): ReactElement {
   const form = useForm({
     fields: [nameField, romFilePathField, locationDirPathField],
     onSubmit: () => {
-      return dispatch(
+      const error = dispatch(
         createProjectFromSource({
           name: nameField.value,
           romFilePath: romFilePathField.value,
           locationDirPath: locationDirPathField.value,
         }),
       );
+      if (!error) {
+        const projectDirPath = $FileSystem.join(
+          locationDirPathField.value,
+          nameField.value,
+        );
+        dispatch(prioritizeRecentProject(projectDirPath));
+      }
+      return error;
     },
   });
 

@@ -4,6 +4,8 @@ import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 
 export const $FileSystem = {
+  basename: path.basename,
+
   copyFile: (sourcePath: string, targetPath: string) => {
     try {
       fs.copyFileSync(sourcePath, targetPath);

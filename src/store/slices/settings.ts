@@ -3,14 +3,30 @@ import { Dispatch } from 'react';
 import {
   SettingBoolean,
   SettingNumber,
+  SettingPriorityList,
   SettingsStore,
   SettingString,
 } from '../../utils-electron/Settings.types';
+import { $PriorityList, PriorityList } from '../../utils/PriorityList';
 
 type SettingsState = SettingsStore;
 type AppState = { settings: SettingsState };
 
 const { $Settings } = window.api;
+
+// Selectors
+
+export const getSettingBoolean = (key: SettingBoolean) => (state: AppState) =>
+  state.settings[key];
+
+export const getSettingNumber = (key: SettingNumber) => (state: AppState) =>
+  state.settings[key];
+
+export const getSettingString = (key: SettingString) => (state: AppState) =>
+  state.settings[key];
+
+export const getRecentProjects = () => (state: AppState) =>
+  state.settings[SettingPriorityList.RecentProjects];
 
 // Thunks
 
@@ -38,6 +54,36 @@ export const setSettingString =
     dispatch({ type: 'settings/setString', payload: { key, value } });
   };
 
+type PriorityListAction = {
+  key: SettingPriorityList;
+  value: PriorityList<string>;
+};
+export const prioritizeRecentProject =
+  (dirPath: string) =>
+  (
+    dispatch: Dispatch<PayloadAction<PriorityListAction>>,
+    getState: () => AppState,
+  ) => {
+    const key = SettingPriorityList.RecentProjects;
+    const recentProjects = getState().settings[key];
+    const value = $PriorityList.prioritize(recentProjects, dirPath);
+    $Settings.setPriorityList(key, value);
+    dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+  };
+
+export const removeRecentProject =
+  (dirPath: string) =>
+  (
+    dispatch: Dispatch<PayloadAction<PriorityListAction>>,
+    getState: () => AppState,
+  ) => {
+    const key = SettingPriorityList.RecentProjects;
+    const recentProjects = getState().settings[key];
+    const value = $PriorityList.remove(recentProjects, dirPath);
+    $Settings.setPriorityList(key, value);
+    dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+  };
+
 // Slice
 
 export const initialState: SettingsState = {
@@ -53,6 +99,7 @@ export const initialState: SettingsState = {
   AskConfirmationBeforeApplyingPatch: $Settings.getBoolean(
     SettingBoolean.AskConfirmationBeforeApplyingPatch,
   ),
+  RecentProjects: $Settings.getPriorityList(SettingPriorityList.RecentProjects),
 };
 
 const settingsSlice = createSlice({
@@ -66,6 +113,12 @@ const settingsSlice = createSlice({
     'settings/setNumber': (state, action: PayloadAction<NumberAction>) => {
       state[action.payload.key] = action.payload.value;
     },
+    'settings/setPriorityList': (
+      state,
+      action: PayloadAction<PriorityListAction>,
+    ) => {
+      state[action.payload.key] = action.payload.value;
+    },
     'settings/setString': (state, action: PayloadAction<StringAction>) => {
       state[action.payload.key] = action.payload.value;
     },
@@ -73,14 +126,3 @@ const settingsSlice = createSlice({
 });
 
 export const reducer = settingsSlice.reducer;
-
-// Selectors
-
-export const getSettingBoolean = (key: SettingBoolean) => (state: AppState) =>
-  state.settings[key];
-
-export const getSettingNumber = (key: SettingNumber) => (state: AppState) =>
-  state.settings[key];
-
-export const getSettingString = (key: SettingString) => (state: AppState) =>
-  state.settings[key];
