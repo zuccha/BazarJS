@@ -15,7 +15,13 @@ export default function PageButton({
 }: PageButtonProps): ReactElement {
   return (
     <Tooltip label={label} placement='right'>
-      <IconButton label={label} icon={icon} onClick={onClick} variant='ghost' />
+      <IconButton
+        label={label}
+        icon={icon}
+        onClick={onClick}
+        size='lg'
+        variant='ghost'
+      />
     </Tooltip>
   );
 }

@@ -35,7 +35,7 @@ export default function AppNavigation(): ReactElement {
 
   return (
     <Flex height='100%'>
-      <VStack p='3' bg='app.bg2'>
+      <VStack p='3' bg='app.bg1'>
         <PageButton
           icon={<DragHandleIcon />}
           label='Home'

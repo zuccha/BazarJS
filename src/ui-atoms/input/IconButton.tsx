@@ -6,6 +6,7 @@ interface IconButtonProps {
   icon: ReactElement;
   label: string;
   onClick: () => void;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
 }
 
@@ -13,6 +14,7 @@ export default function IconButton({
   icon,
   label,
   onClick,
+  size,
   variant = 'solid',
 }: IconButtonProps): ReactElement {
   const colorScheme = useColorScheme();
@@ -22,7 +24,7 @@ export default function IconButton({
       colorScheme={colorScheme}
       icon={icon}
       onClick={onClick}
-      size='lg'
+      size={size}
       variant={variant}
     />
   );
