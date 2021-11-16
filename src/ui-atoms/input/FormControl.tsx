@@ -73,8 +73,10 @@ export function useFormField<T>({
   onValidate?: (value: T) => ErrorReport | undefined;
 }): FormField<T> {
   const [value, setValue] = useState(initialValue);
-  const [isDirty, setIsDirty] = useState(false);
-  const [errorReport, setErrorReport] = useState<ErrorReport | undefined>();
+  const [isDirty, setIsDirty] = useState(!!initialValue);
+  const [errorReport, setErrorReport] = useState<ErrorReport | undefined>(
+    isDirty ? onValidate(value) : undefined,
+  );
 
   const handleChange = useCallback(
     (newValue: T) => {
