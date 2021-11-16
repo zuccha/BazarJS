@@ -1,30 +1,38 @@
 import { Center, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../store';
+import {
+  getSettingString,
+  setSettingString,
+} from '../../../store/slices/settings';
 import BrowserInput from '../../../ui-atoms/input/BrowserInput';
 import Button from '../../../ui-atoms/input/Button';
 import FormControl, { useFormField } from '../../../ui-atoms/input/FormControl';
 import { SettingString } from '../../../utils-electron/Settings.types';
 
-const { $FileSystem, $Settings } = window.api;
+const { $FileSystem } = window.api;
 
 export default function Settings(): ReactElement {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const defaultLocationDirPath = useSelector(
+    getSettingString(SettingString.NewProjectDefaultLocationDirPath),
+  );
   const newProjectDefaultLocationDirPathField = useFormField({
     infoMessage: 'Default directory for new projects',
-    initialValue: $Settings.getString(
-      SettingString.NewProjectDefaultLocationDirPath,
-      '',
-    ),
+    initialValue: defaultLocationDirPath,
     isRequired: true,
     label: 'Default destination directory',
     onValidate: $FileSystem.validateExistsDir,
   });
 
+  const defaultRomFilePath = useSelector(
+    getSettingString(SettingString.NewProjectDefaultRomFilePath),
+  );
   const newProjectDefaultRomFilePathField = useFormField({
     infoMessage: 'ROM used for the project (a copy will be made).',
-    initialValue: $Settings.getString(
-      SettingString.NewProjectDefaultRomFilePath,
-      '',
-    ),
+    initialValue: defaultRomFilePath,
     isRequired: true,
     label: 'Default ROM file',
     onValidate: (value: string) =>
@@ -79,16 +87,10 @@ export default function Settings(): ReactElement {
             label='Reset'
             onClick={() => {
               newProjectDefaultLocationDirPathField.handleChange(
-                $Settings.getString(
-                  SettingString.NewProjectDefaultLocationDirPath,
-                  '',
-                ),
+                defaultLocationDirPath,
               );
               newProjectDefaultRomFilePathField.handleChange(
-                $Settings.getString(
-                  SettingString.NewProjectDefaultRomFilePath,
-                  '',
-                ),
+                defaultRomFilePath,
               );
             }}
             variant='outline'
@@ -96,13 +98,17 @@ export default function Settings(): ReactElement {
           <Button
             label='Save'
             onClick={() => {
-              $Settings.setString(
-                SettingString.NewProjectDefaultLocationDirPath,
-                newProjectDefaultLocationDirPathField.value,
+              dispatch(
+                setSettingString(
+                  SettingString.NewProjectDefaultLocationDirPath,
+                  newProjectDefaultLocationDirPathField.value,
+                ),
               );
-              $Settings.setString(
-                SettingString.NewProjectDefaultRomFilePath,
-                newProjectDefaultRomFilePathField.value,
+              dispatch(
+                setSettingString(
+                  SettingString.NewProjectDefaultRomFilePath,
+                  newProjectDefaultRomFilePathField.value,
+                ),
               );
             }}
           />

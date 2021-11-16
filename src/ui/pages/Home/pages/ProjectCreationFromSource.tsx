@@ -1,6 +1,6 @@
 import { Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../../store';
 import {
   AppHomeRouteName,
@@ -18,8 +18,9 @@ import FormControl, {
 import FormError from '../../../../ui-atoms/input/FormError';
 import TextInput from '../../../../ui-atoms/input/TextInput';
 import { SettingString } from '../../../../utils-electron/Settings.types';
+import { getSettingString } from '../../../../store/slices/settings';
 
-const { $FileSystem, $Settings } = window.api;
+const { $FileSystem } = window.api;
 
 export default function ProjectCreationFromSource(): ReactElement {
   const nameField = useFormField({
@@ -30,23 +31,23 @@ export default function ProjectCreationFromSource(): ReactElement {
     onValidate: $FileSystem.validateIsValidName,
   });
 
+  const defaultLocationDirPath = useSelector(
+    getSettingString(SettingString.NewProjectDefaultLocationDirPath),
+  );
   const locationDirPathField = useFormField({
     infoMessage: 'The project will be created in this directory.',
-    initialValue: $Settings.getString(
-      SettingString.NewProjectDefaultLocationDirPath,
-      '',
-    ),
+    initialValue: defaultLocationDirPath,
     isRequired: true,
     label: 'Destination directory',
     onValidate: $FileSystem.validateExistsDir,
   });
 
+  const defaultRomFilePath = useSelector(
+    getSettingString(SettingString.NewProjectDefaultRomFilePath),
+  );
   const romFilePathField = useFormField({
     infoMessage: 'ROM used for the project (a copy will be made).',
-    initialValue: $Settings.getString(
-      SettingString.NewProjectDefaultRomFilePath,
-      '',
-    ),
+    initialValue: defaultRomFilePath,
     isRequired: true,
     label: 'ROM file',
     onValidate: (value: string) =>
