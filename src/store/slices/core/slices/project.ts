@@ -30,3 +30,4 @@ export const setProjectName = projectApi.createMutation($Project.setName);
 export const createProjectFromSource = projectApi.createConstructor(
   $Project.createFromSource,
 );
+export const openProject = projectApi.createConstructor($Project.open);

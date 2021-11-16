@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 
 export const $FileSystem = {
@@ -23,11 +24,28 @@ export const $FileSystem = {
 
   join: path.join,
 
+  loadJson: (path: string): EitherErrorOr<unknown> => {
+    try {
+      return $EitherErrorOr.value(JSON.parse(fs.readFileSync(path, 'utf8')));
+    } catch {
+      const errorMessage = `Failed to load JSON file "${path}"`;
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+  },
+
   removePath: (path: string): ErrorReport | undefined => {
     try {
       fs.rmSync(path, { recursive: true });
     } catch {
       return $ErrorReport.make(`Failed to delete path "${path}"`);
+    }
+  },
+
+  saveJson: (path: string, data: unknown): ErrorReport | undefined => {
+    try {
+      fs.writeFileSync(path, JSON.stringify(data, null, 2));
+    } catch (error) {
+      return $ErrorReport.make(`Failed to save JSON file "${path}"`);
     }
   },
 
