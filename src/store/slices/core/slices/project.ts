@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { $Project, Project } from '../../core/Project';
-import createOptionalApi from '../utils/createOptionalApi';
+import { $Project, Project } from '../../../../core/Project';
+import createOptionalApi from '../../../utils/createOptionalApi';
 
 type ProjectState = Project | null;
-type AppState = { project: ProjectState };
+type AppState = { core: { project: ProjectState } };
 
 export const initialState: ProjectState = null as ProjectState;
 
-const selectState = (state: AppState) => state.project;
+const selectState = (state: AppState) => state.core.project;
 
 const projectApi = createOptionalApi({
   id: 'project',

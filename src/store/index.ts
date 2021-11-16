@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import * as navigation from './navigation';
-import * as project from './project';
+import * as navigation from './slices/navigation';
+import * as core from './slices/core';
 
 const store = configureStore({
   reducer: {
+    core: core.reducer,
     navigation: navigation.reducer,
-    project: project.reducer,
   },
 });
 

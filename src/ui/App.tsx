@@ -8,7 +8,11 @@ import {
 import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppRouteName, selectAppRoute, setAppRoute } from '../store/navigation';
+import {
+  AppRouteName,
+  selectAppRoute,
+  setAppRoute,
+} from '../store/slices/navigation';
 import PageButton from './PageButton';
 import About from './pages/About';
 import Help from './pages/Help';

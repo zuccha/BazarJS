@@ -7,8 +7,8 @@ import {
   AppRouteName,
   setAppHomeRoute,
   setAppRoute,
-} from '../../../../store/navigation';
-import { createProjectFromSource } from '../../../../store/project';
+} from '../../../../store/slices/navigation';
+import { createProjectFromSource } from '../../../../store/slices/core/slices/project';
 import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
 import Button from '../../../../ui-atoms/input/Button';
 import FormControl, {

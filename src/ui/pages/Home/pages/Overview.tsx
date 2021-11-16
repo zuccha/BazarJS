@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import {
   AppHomeRouteName,
   setAppHomeRoute,
-} from '../../../../store/navigation';
+} from '../../../../store/slices/navigation';
 import Button from '../../../../ui-atoms/input/Button';
 
 export default function Overview(): ReactElement {

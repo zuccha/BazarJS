@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import {
   AppHomeRouteName,
   selectAppHomeRoute,
-} from '../../../store/navigation';
+} from '../../../store/slices/navigation';
 import Overview from './pages/Overview';
 import ProjectCreationFromSource from './pages/ProjectCreationFromSource';
 import ProjectCreationFromTemplate from './pages/ProjectCreationFromTemplate';
