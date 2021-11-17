@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
-import { ProjectSnapshot } from './ProjectSnapshot';
 
 const { $FileSystem } = window.api;
 
@@ -9,13 +8,10 @@ const ProjectConfigSchema = z.object({
   name: z.string(),
 });
 
-type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
+export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
 
 export interface Project {
-  name: string;
-  // latestSnapshot: ProjectSnapshot;
-  backupSnapshots: ProjectSnapshot[];
-
+  config: ProjectConfig;
   directory: string;
 }
 
@@ -77,15 +73,15 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    if ((error = $Project.saveConfig(directory, { name }))) {
+    const config = { name };
+    if ((error = $Project.saveConfig(directory, config))) {
       $FileSystem.removePath(directory);
       const errorMessage = `${errorPrefix}: failed to save config`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
     return $EitherErrorOr.value({
-      name,
-      backupSnapshots: [],
+      config,
       directory,
     });
   },
@@ -112,15 +108,14 @@ export const $Project = {
     }
 
     return $EitherErrorOr.value({
-      name: config.value.name,
-      backupSnapshots: [],
+      config: config.value,
       directory,
     });
   },
 
   // Methods
 
-  getName: (project: Project): string => project.name,
+  getConfig: (project: Project): ProjectConfig => project.config,
 
   setName: (project: Project, name: string): EitherErrorOr<Project> => {
     return $EitherErrorOr.value({

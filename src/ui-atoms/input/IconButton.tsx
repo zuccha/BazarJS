@@ -4,6 +4,7 @@ import useColorScheme from '../../theme/useColorScheme';
 
 interface IconButtonProps {
   icon: ReactElement;
+  isDisabled?: boolean;
   label: string;
   onClick: () => void;
   size?: 'xs' | 'sm' | 'md' | 'lg';
@@ -12,6 +13,7 @@ interface IconButtonProps {
 
 export default function IconButton({
   icon,
+  isDisabled,
   label,
   onClick,
   size,
@@ -22,6 +24,7 @@ export default function IconButton({
     <Chakra.IconButton
       aria-label={label}
       colorScheme={colorScheme}
+      isDisabled={isDisabled}
       icon={icon}
       onClick={onClick}
       size={size}
