@@ -1,6 +1,10 @@
-import { ReactElement } from 'react';
-import { useSelector } from 'react-redux';
-import { getProjectConfig } from '../../../../store/slices/core/slices/project';
+import { ReactElement, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../../store';
+import {
+  getProjectConfig,
+  setProjectConfig,
+} from '../../../../store/slices/core/slices/project';
 import Config from './Config';
 
 const defaultConfig = {
@@ -9,6 +13,21 @@ const defaultConfig = {
 };
 
 export default function Sidebar(): ReactElement {
+  const dispatch = useDispatch<AppDispatch>();
+
   const config = useSelector(getProjectConfig());
-  return <Config config={config ?? defaultConfig} isDisabled={!config} />;
+  const editConfig = useCallback(
+    (newConfig) => {
+      dispatch(setProjectConfig(newConfig));
+    },
+    [dispatch],
+  );
+
+  return (
+    <Config
+      config={config ?? defaultConfig}
+      isDisabled={!config}
+      onEdit={editConfig}
+    />
+  );
 }

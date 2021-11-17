@@ -26,7 +26,7 @@ const projectSlice = createSlice({
 export const reducer = projectSlice.reducer;
 
 export const getProjectConfig = projectApi.createQuery($Project.getConfig);
-export const setProjectName = projectApi.createMutation($Project.setName);
+export const setProjectConfig = projectApi.createMutation($Project.setConfig);
 export const createProjectFromSource = projectApi.createConstructor(
   $Project.createFromSource,
 );

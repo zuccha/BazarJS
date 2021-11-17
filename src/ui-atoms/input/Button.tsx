@@ -1,8 +1,9 @@
 import * as Chakra from '@chakra-ui/react';
+import { SpaceProps } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
 
-interface ButtonProps {
+interface ButtonProps extends SpaceProps {
   isDisabled?: boolean;
   isFullWidth?: boolean;
   label: string;
@@ -16,6 +17,7 @@ export default function Button({
   label,
   onClick,
   variant = 'solid',
+  ...props
 }: ButtonProps): ReactElement {
   const colorScheme = useColorScheme();
   return (
@@ -29,6 +31,7 @@ export default function Button({
       py={1}
       size='sm'
       variant={variant}
+      {...props}
     >
       {label}
     </Chakra.Button>

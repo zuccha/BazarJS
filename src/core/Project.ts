@@ -120,11 +120,14 @@ export const $Project = {
 
   getConfig: (project: Project): ProjectConfig => project.config,
 
-  setName: (project: Project, name: string): EitherErrorOr<Project> => {
-    return $EitherErrorOr.value({
-      ...project,
-      name,
-    });
+  setConfig: (
+    project: Project,
+    config: ProjectConfig,
+  ): EitherErrorOr<Project> => {
+    const error = $Project.saveConfig(project.directory, config);
+    return error
+      ? $EitherErrorOr.error(error)
+      : $EitherErrorOr.value({ ...project, config });
   },
 
   // Utils
