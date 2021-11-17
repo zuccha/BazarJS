@@ -63,7 +63,12 @@ export default function AppNavigation(): ReactElement {
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Help }))}
         />
       </VStack>
-      <Flex flex={1} bg='app.bg3'>
+      <Flex
+        flex={1}
+        bg='app.bg3'
+        alignItems='flex-start'
+        justifyContent='flex-start'
+      >
         <Page />
       </Flex>
     </Flex>

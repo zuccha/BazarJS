@@ -77,7 +77,7 @@ export default function Overview(): ReactElement {
   );
 
   return (
-    <Center flex={1}>
+    <Center flex={1} height='100%'>
       <VStack alignItems='flex-start' spacing={8} maxW={400}>
         <VStack alignItems='center' w='100%'>
           <Heading size='md' color='app.fg1'>

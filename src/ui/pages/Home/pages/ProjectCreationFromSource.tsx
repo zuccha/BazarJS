@@ -82,7 +82,7 @@ export default function ProjectCreationFromSource(): ReactElement {
   });
 
   return (
-    <Center flex={1} p={10}>
+    <Center flex={1} p={10} height='100%'>
       <VStack alignItems='flex-start' spacing={10} w='100%' maxW='600px'>
         <VStack alignItems='flex-start'>
           <Heading size='lg' color='app.fg1'>
