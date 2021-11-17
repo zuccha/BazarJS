@@ -34,6 +34,13 @@ export default function ProjectCreationFromSource(): ReactElement {
     onValidate: $FileSystem.validateIsValidName,
   });
 
+  const authorField = useFormField({
+    infoMessage: 'Author of the project.',
+    initialValue: '',
+    isRequired: false,
+    label: 'Author',
+  });
+
   const defaultLocationDirPath = useSelector(
     getSettingString(SettingString.NewProjectDefaultLocationDirPath),
   );
@@ -65,9 +72,10 @@ export default function ProjectCreationFromSource(): ReactElement {
     onSubmit: () => {
       const error = dispatch(
         createProjectFromSource({
-          name: nameField.value,
-          romFilePath: romFilePathField.value,
-          locationDirPath: locationDirPathField.value,
+          name: nameField.value.trim(),
+          author: authorField.value.trim(),
+          romFilePath: romFilePathField.value.trim(),
+          locationDirPath: locationDirPathField.value.trim(),
         }),
       );
       if (!error) {
@@ -102,6 +110,15 @@ export default function ProjectCreationFromSource(): ReactElement {
               onChange={nameField.handleChange}
               placeholder={nameField.control.label}
               value={nameField.value}
+            />
+          </FormControl>
+
+          <FormControl {...authorField.control}>
+            <TextInput
+              onBlur={authorField.handleBlur}
+              onChange={authorField.handleChange}
+              placeholder={authorField.control.label}
+              value={authorField.value}
             />
           </FormControl>
 

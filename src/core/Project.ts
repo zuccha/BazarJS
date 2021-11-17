@@ -6,6 +6,7 @@ const { $FileSystem } = window.api;
 
 const ProjectConfigSchema = z.object({
   name: z.string(),
+  author: z.string(),
 });
 
 export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
@@ -25,10 +26,12 @@ export const $Project = {
 
   createFromSource: ({
     name,
+    author,
     locationDirPath,
     romFilePath,
   }: {
     name: string;
+    author: string;
     locationDirPath: string;
     romFilePath: string;
   }): EitherErrorOr<Project> => {
@@ -73,7 +76,7 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    const config = { name };
+    const config = { name, author };
     if ((error = $Project.saveConfig(directory, config))) {
       $FileSystem.removePath(directory);
       const errorMessage = `${errorPrefix}: failed to save config`;

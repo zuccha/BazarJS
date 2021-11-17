@@ -35,7 +35,7 @@ export default function Config({
       </Flex>
 
       <VStack spacing={1} alignItems='flex-start'>
-        <Text fontSize={14}>Author: zuccha</Text>
+        <Text fontSize={14}>Author: {config.author || '-'}</Text>
       </VStack>
     </VStack>
   );

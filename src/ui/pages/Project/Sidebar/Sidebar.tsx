@@ -5,6 +5,7 @@ import Config from './Config';
 
 const defaultConfig = {
   name: 'No project',
+  author: '',
 };
 
 export default function Sidebar(): ReactElement {
