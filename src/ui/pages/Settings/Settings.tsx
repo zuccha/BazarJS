@@ -27,15 +27,11 @@ export default function Settings(): ReactElement {
   return (
     <Center flex={1} p={10} h='100%'>
       <Flex direction='column' h='100%' w='100%' maxW='600px'>
-        <VStack
-          flex={1}
-          alignItems='flex-start'
-          spacing={8}
-          w='100%'
-          overflowY='auto'
-        >
-          <NewProjectSettings ref={newProjectSettingsRef} />
-        </VStack>
+        <Flex direction='column' flex={1} w='100%' overflowY='auto'>
+          <VStack alignItems='flex-start' spacing={8} w='100%' margin='auto'>
+            <NewProjectSettings ref={newProjectSettingsRef} />
+          </VStack>
+        </Flex>
         <HStack w='100%' justifyContent='flex-end' pt={6}>
           <Button label='Reset' onClick={handleReset} variant='outline' />
           <Button label='Save' onClick={handleSave} />
