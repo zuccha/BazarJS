@@ -87,6 +87,9 @@ export const removeRecentProject =
 // Slice
 
 export const initialState: SettingsState = {
+  NewProjectDefaultAuthor: $Settings.getString(
+    SettingString.NewProjectDefaultAuthor,
+  ),
   NewProjectDefaultLocationDirPath: $Settings.getString(
     SettingString.NewProjectDefaultLocationDirPath,
   ),

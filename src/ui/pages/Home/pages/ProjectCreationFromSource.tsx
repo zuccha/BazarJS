@@ -34,9 +34,12 @@ export default function ProjectCreationFromSource(): ReactElement {
     onValidate: $FileSystem.validateIsValidName,
   });
 
+  const defaultAuthor = useSelector(
+    getSettingString(SettingString.NewProjectDefaultAuthor),
+  );
   const authorField = useFormField({
     infoMessage: 'Author of the project.',
-    initialValue: '',
+    initialValue: defaultAuthor,
     isRequired: false,
     label: 'Author',
   });

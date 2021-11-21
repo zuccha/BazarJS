@@ -13,6 +13,7 @@ import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
 import FormControl, {
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
+import TextInput from '../../../../ui-atoms/input/TextInput';
 import { SettingString } from '../../../../utils-electron/Settings.types';
 import SettingsGroup from '../SettingsGroup';
 
@@ -27,6 +28,15 @@ function NewProjectSettings(
   props: {},
   ref: ForwardedRef<NewProjectSettingsRef>,
 ): ReactElement {
+  const defaultAuthor = useSelector(
+    getSettingString(SettingString.NewProjectDefaultAuthor),
+  );
+  const defaultAuthorField = useFormField({
+    infoMessage: 'Default author for new projects',
+    initialValue: defaultAuthor,
+    label: 'Default author',
+  });
+
   const defaultLocationDirPath = useSelector(
     getSettingString(SettingString.NewProjectDefaultLocationDirPath),
   );
@@ -55,6 +65,12 @@ function NewProjectSettings(
     save: () => {
       dispatch(
         setSettingString(
+          SettingString.NewProjectDefaultAuthor,
+          defaultAuthorField.value,
+        ),
+      );
+      dispatch(
+        setSettingString(
           SettingString.NewProjectDefaultLocationDirPath,
           defaultLocationDirPathField.value,
         ),
@@ -67,6 +83,7 @@ function NewProjectSettings(
       );
     },
     reset: () => {
+      defaultAuthorField.handleChange(defaultAuthor);
       defaultLocationDirPathField.handleChange(defaultLocationDirPath);
       defaultRomFilePathField.handleChange(defaultRomFilePath);
     },
@@ -74,6 +91,15 @@ function NewProjectSettings(
 
   return (
     <SettingsGroup title='New project'>
+      <FormControl {...defaultAuthorField.control}>
+        <TextInput
+          onBlur={defaultAuthorField.handleBlur}
+          onChange={defaultAuthorField.handleChange}
+          placeholder={defaultAuthorField.control.label}
+          value={defaultAuthorField.value}
+        />
+      </FormControl>
+
       <FormControl {...defaultLocationDirPathField.control}>
         <BrowserInput
           mode='directory'
