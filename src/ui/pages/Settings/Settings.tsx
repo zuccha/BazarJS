@@ -1,4 +1,4 @@
-import { Center, Flex, HStack, VStack } from '@chakra-ui/react';
+import { Center, Flex, HStack, useToast, VStack } from '@chakra-ui/react';
 import { ReactElement, useCallback, useRef } from 'react';
 import Button from '../../../ui-atoms/input/Button';
 import NewProjectSettings, {
@@ -6,6 +6,8 @@ import NewProjectSettings, {
 } from './groups/NewProjectSettings';
 
 export default function Settings(): ReactElement {
+  const toast = useToast();
+
   const newProjectSettingsRef = useRef<NewProjectSettingsRef>(null);
 
   const handleReset = useCallback(() => {
@@ -14,6 +16,12 @@ export default function Settings(): ReactElement {
 
   const handleSave = useCallback(() => {
     newProjectSettingsRef.current?.save();
+    toast({
+      title: 'Settings saved',
+      description: 'Your settings have been saved',
+      status: 'success',
+      isClosable: true,
+    });
   }, [newProjectSettingsRef.current?.save]);
 
   return (
