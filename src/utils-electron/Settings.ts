@@ -54,6 +54,6 @@ export const $Settings = {
   },
 
   setString: (key: SettingString, value: string): void => {
-    store.set(key, value);
+    value ? store.set(key, value) : store.delete(key);
   },
 };
