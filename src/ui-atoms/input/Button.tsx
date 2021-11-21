@@ -1,9 +1,9 @@
 import * as Chakra from '@chakra-ui/react';
-import { SpaceProps } from '@chakra-ui/react';
+import { LayoutProps, SpaceProps } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
 
-interface ButtonProps extends SpaceProps {
+interface ButtonProps extends LayoutProps, SpaceProps {
   isDisabled?: boolean;
   isFullWidth?: boolean;
   label: string;

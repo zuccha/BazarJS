@@ -1,13 +1,8 @@
-import { Center, Flex, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Alert, AlertIcon, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../../store';
-import {
-  AppHomeRouteName,
-  AppRouteName,
-  setAppHomeRoute,
-  setAppRoute,
-} from '../../../../store/slices/navigation';
+import { AppRouteName, setAppRoute } from '../../../../store/slices/navigation';
 import { createProjectFromSource } from '../../../../store/slices/core/slices/project';
 import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
 import Button from '../../../../ui-atoms/input/Button';
@@ -15,17 +10,23 @@ import FormControl, {
   useForm,
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
-import FormError from '../../../../ui-atoms/input/FormError';
 import TextInput from '../../../../ui-atoms/input/TextInput';
 import { SettingString } from '../../../../utils-electron/Settings.types';
 import {
   getSettingString,
   prioritizeRecentProject,
 } from '../../../../store/slices/settings';
+import Drawer from '../../../../ui-atoms/overlay/Drawer';
 
 const { $FileSystem } = window.api;
 
-export default function ProjectCreationFromSource(): ReactElement {
+interface ProjectCreationFromSourceProps {
+  onClose: () => void;
+}
+
+export default function ProjectCreationFromSource({
+  onClose,
+}: ProjectCreationFromSourceProps): ReactElement {
   const nameField = useFormField({
     infoMessage: 'This will be the name fo the project directory.',
     initialValue: 'MyProject',
@@ -93,83 +94,72 @@ export default function ProjectCreationFromSource(): ReactElement {
   });
 
   return (
-    <Center flex={1} p={10} height='100%'>
-      <VStack alignItems='flex-start' spacing={10} w='100%' maxW='600px'>
-        <VStack alignItems='flex-start'>
-          <Heading size='lg' color='app.fg1'>
-            Create a project
-          </Heading>
-          <Text fontSize='md'>
-            Select a project name, a base ROM and a location to create a
-            project. A new directory with the chosen name will be created in the
-            selected location, and the base ROM will be copied in it.
-          </Text>
-        </VStack>
-
-        <VStack width='100%' spacing={4}>
-          <FormControl {...nameField.control}>
-            <TextInput
-              onBlur={nameField.handleBlur}
-              onChange={nameField.handleChange}
-              placeholder={nameField.control.label}
-              value={nameField.value}
-            />
-          </FormControl>
-
-          <FormControl {...authorField.control}>
-            <TextInput
-              onBlur={authorField.handleBlur}
-              onChange={authorField.handleChange}
-              placeholder={authorField.control.label}
-              value={authorField.value}
-            />
-          </FormControl>
-
-          <FormControl {...locationDirPathField.control}>
-            <BrowserInput
-              mode='directory'
-              onBlur={locationDirPathField.handleBlur}
-              onChange={locationDirPathField.handleChange}
-              placeholder={locationDirPathField.control.label}
-              value={locationDirPathField.value}
-            />
-          </FormControl>
-
-          <FormControl {...romFilePathField.control}>
-            <BrowserInput
-              filters={[{ name: 'ROM', extensions: ['smc'] }]}
-              mode='file'
-              onBlur={romFilePathField.handleBlur}
-              onChange={romFilePathField.handleChange}
-              placeholder={romFilePathField.control.label}
-              value={romFilePathField.value}
-            />
-          </FormControl>
-        </VStack>
-
-        <HStack width='100%' justifyContent='flex-end'>
-          {form.error && <FormError errorReport={form.error} />}
-          <Flex flex={1} />
-          <Button
-            label='Cancel'
-            onClick={() =>
-              dispatch(setAppHomeRoute({ name: AppHomeRouteName.Overview }))
-            }
-            variant='outline'
-          />
+    <Drawer
+      buttons={
+        <>
+          <Button label='Cancel' onClick={onClose} variant='outline' mr={3} />
           <Button
             label='Create'
             onClick={() => {
               const maybeError = form.handleSubmit();
               if (!maybeError) {
                 dispatch(setAppRoute({ name: AppRouteName.Project }));
-                dispatch(setAppHomeRoute({ name: AppHomeRouteName.Overview }));
+                onClose();
               }
             }}
             isDisabled={!form.isValid}
           />
-        </HStack>
+        </>
+      }
+      onClose={onClose}
+      title='Edit config'
+    >
+      <VStack width='100%' spacing={4}>
+        <FormControl {...nameField.control}>
+          <TextInput
+            onBlur={nameField.handleBlur}
+            onChange={nameField.handleChange}
+            placeholder={nameField.control.label}
+            value={nameField.value}
+          />
+        </FormControl>
+
+        <FormControl {...authorField.control}>
+          <TextInput
+            onBlur={authorField.handleBlur}
+            onChange={authorField.handleChange}
+            placeholder={authorField.control.label}
+            value={authorField.value}
+          />
+        </FormControl>
+
+        <FormControl {...locationDirPathField.control}>
+          <BrowserInput
+            mode='directory'
+            onBlur={locationDirPathField.handleBlur}
+            onChange={locationDirPathField.handleChange}
+            placeholder={locationDirPathField.control.label}
+            value={locationDirPathField.value}
+          />
+        </FormControl>
+
+        <FormControl {...romFilePathField.control}>
+          <BrowserInput
+            filters={[{ name: 'ROM', extensions: ['smc'] }]}
+            mode='file'
+            onBlur={romFilePathField.handleBlur}
+            onChange={romFilePathField.handleChange}
+            placeholder={romFilePathField.control.label}
+            value={romFilePathField.value}
+          />
+        </FormControl>
+
+        <Alert status='info'>
+          <AlertIcon />A new directory named after the chosen project name will
+          be created in the selected location, containing a copy of the base ROM
+          and generated files.
+        </Alert>
       </VStack>
-    </Center>
+    </Drawer>
   );
 }

@@ -1,21 +1,17 @@
+import { Center, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  AppHomeRouteName,
-  selectAppHomeRoute,
-} from '../../../store/slices/navigation';
-import Overview from './pages/Overview';
-import ProjectCreationFromSource from './pages/ProjectCreationFromSource';
-import ProjectCreationFromTemplate from './pages/ProjectCreationFromTemplate';
-
-const PageByAppRouteName: Record<AppHomeRouteName, () => ReactElement> = {
-  [AppHomeRouteName.Overview]: Overview,
-  [AppHomeRouteName.ProjectCreationFromSource]: ProjectCreationFromSource,
-  [AppHomeRouteName.ProjectCreationFromTemplate]: ProjectCreationFromTemplate,
-} as const;
+import Actions from './Actions';
+import Header from './Header';
+import RecentProjects from './RecentProjects';
 
 export default function Home(): ReactElement {
-  const appRoute = useSelector(selectAppHomeRoute);
-  const Page = PageByAppRouteName[appRoute.name];
-  return <Page />;
+  return (
+    <Center flex={1} height='100%'>
+      <VStack alignItems='flex-start' spacing={8} maxW={400}>
+        <Header />
+        <Actions />
+        <RecentProjects />
+      </VStack>
+    </Center>
+  );
 }
