@@ -7,6 +7,7 @@ import {
   SettingsStore,
   SettingString,
 } from '../../utils-electron/Settings.types';
+import { ErrorReport } from '../../utils/ErrorReport';
 import { $PriorityList, PriorityList } from '../../utils/PriorityList';
 
 type SettingsState = SettingsStore;
@@ -33,25 +34,40 @@ export const getRecentProjects = () => (state: AppState) =>
 type BooleanAction = { key: SettingBoolean; value: boolean };
 export const setSettingBoolean =
   (key: SettingBoolean, value: boolean) =>
-  (dispatch: Dispatch<PayloadAction<BooleanAction>>) => {
-    $Settings.setBoolean(key, value);
-    dispatch({ type: 'settings/setBoolean', payload: { key, value } });
+  (
+    dispatch: Dispatch<PayloadAction<BooleanAction>>,
+  ): ErrorReport | undefined => {
+    const error = $Settings.setBoolean(key, value);
+    if (!error) {
+      dispatch({ type: 'settings/setBoolean', payload: { key, value } });
+    }
+    return error;
   };
 
 type NumberAction = { key: SettingNumber; value: number };
 export const setSettingNumber =
   (key: SettingNumber, value: number) =>
-  (dispatch: Dispatch<PayloadAction<NumberAction>>) => {
-    $Settings.setNumber(key, value);
-    dispatch({ type: 'settings/setNumber', payload: { key, value } });
+  (
+    dispatch: Dispatch<PayloadAction<NumberAction>>,
+  ): ErrorReport | undefined => {
+    const error = $Settings.setNumber(key, value);
+    if (!error) {
+      dispatch({ type: 'settings/setNumber', payload: { key, value } });
+    }
+    return error;
   };
 
 type StringAction = { key: SettingString; value: string };
 export const setSettingString =
   (key: SettingString, value: string) =>
-  (dispatch: Dispatch<PayloadAction<StringAction>>) => {
-    $Settings.setString(key, value);
-    dispatch({ type: 'settings/setString', payload: { key, value } });
+  (
+    dispatch: Dispatch<PayloadAction<StringAction>>,
+  ): ErrorReport | undefined => {
+    const error = $Settings.setString(key, value);
+    if (!error) {
+      dispatch({ type: 'settings/setString', payload: { key, value } });
+    }
+    return error;
   };
 
 type PriorityListAction = {
@@ -63,12 +79,15 @@ export const prioritizeRecentProject =
   (
     dispatch: Dispatch<PayloadAction<PriorityListAction>>,
     getState: () => AppState,
-  ) => {
+  ): ErrorReport | undefined => {
     const key = SettingPriorityList.RecentProjects;
     const recentProjects = getState().settings[key];
     const value = $PriorityList.prioritize(recentProjects, dirPath);
-    $Settings.setPriorityList(key, value);
-    dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+    const error = $Settings.setPriorityList(key, value);
+    if (!error) {
+      dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+    }
+    return error;
   };
 
 export const removeRecentProject =
@@ -76,12 +95,15 @@ export const removeRecentProject =
   (
     dispatch: Dispatch<PayloadAction<PriorityListAction>>,
     getState: () => AppState,
-  ) => {
+  ): ErrorReport | undefined => {
     const key = SettingPriorityList.RecentProjects;
     const recentProjects = getState().settings[key];
     const value = $PriorityList.remove(recentProjects, dirPath);
-    $Settings.setPriorityList(key, value);
-    dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+    const error = $Settings.setPriorityList(key, value);
+    if (!error) {
+      dispatch({ type: 'settings/setPriorityList', payload: { key, value } });
+    }
+    return error;
   };
 
 // Slice

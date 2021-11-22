@@ -1,4 +1,5 @@
 import Store from 'electron-store';
+import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 import { PriorityList } from '../utils/PriorityList';
 import {
   SettingBoolean,
@@ -14,21 +15,40 @@ export const $Settings = {
   // Boolean
 
   getBoolean: (key: SettingBoolean, defaultValue: boolean = false): boolean => {
-    return store.get(key, defaultValue);
+    try {
+      return store.get(key, defaultValue);
+    } catch {
+      return defaultValue;
+    }
   },
 
-  setBoolean: (key: SettingBoolean, value: boolean): void => {
-    store.set(key, value);
+  setBoolean: (
+    key: SettingBoolean,
+    value: boolean,
+  ): ErrorReport | undefined => {
+    try {
+      store.set(key, value);
+    } catch {
+      return $ErrorReport.make(`Settings: failed to set ${key} to ${value}`);
+    }
   },
 
   // Number
 
   getNumber: (key: SettingNumber, defaultValue: number = 0): number => {
-    return store.get(key, defaultValue);
+    try {
+      return store.get(key, defaultValue);
+    } catch {
+      return defaultValue;
+    }
   },
 
-  setNumber: (key: SettingNumber, value: number): void => {
-    store.set(key, value);
+  setNumber: (key: SettingNumber, value: number): ErrorReport | undefined => {
+    try {
+      store.set(key, value);
+    } catch {
+      return $ErrorReport.make(`Settings: failed to set ${key} to ${value}`);
+    }
   },
 
   // PriorityList
@@ -37,23 +57,39 @@ export const $Settings = {
     key: SettingPriorityList,
     defaultValue: PriorityList<string> = { items: [], size: 6 },
   ): PriorityList<string> => {
-    return store.get(key, defaultValue);
+    try {
+      return store.get(key, defaultValue);
+    } catch {
+      return defaultValue;
+    }
   },
 
   setPriorityList: (
     key: SettingPriorityList,
     value: PriorityList<string>,
-  ): void => {
-    store.set(key, value);
+  ): ErrorReport | undefined => {
+    try {
+      store.set(key, value);
+    } catch {
+      return $ErrorReport.make(`Settings: failed to set ${key} to ${value}`);
+    }
   },
 
   // String
 
   getString: (key: SettingString, defaultValue: string = ''): string => {
-    return store.get(key, defaultValue);
+    try {
+      return store.get(key, defaultValue);
+    } catch {
+      return defaultValue;
+    }
   },
 
-  setString: (key: SettingString, value: string): void => {
-    value ? store.set(key, value) : store.delete(key);
+  setString: (key: SettingString, value: string): ErrorReport | undefined => {
+    try {
+      value ? store.set(key, value) : store.delete(key);
+    } catch {
+      return $ErrorReport.make(`Settings: failed to set ${key} to ${value}`);
+    }
   },
 };
