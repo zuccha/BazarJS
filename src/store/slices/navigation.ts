@@ -15,6 +15,7 @@ export enum AppRouteName {
   Home = 'Home',
   Project = 'Project',
   Settings = 'Settings',
+  Tools = 'Tools',
 }
 
 export type AppRoute = Route<AppRouteName>;

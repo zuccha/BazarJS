@@ -2,6 +2,7 @@ import {
   CopyIcon,
   DragHandleIcon,
   InfoIcon,
+  LinkIcon,
   QuestionIcon,
   SettingsIcon,
 } from '@chakra-ui/icons';
@@ -19,6 +20,7 @@ import Help from './pages/Help';
 import Home from './pages/Home';
 import Project from './pages/Project';
 import Settings from './pages/Settings';
+import Tools from './pages/Tools';
 
 const PageByAppRouteName: Record<AppRouteName, () => ReactElement> = {
   [AppRouteName.About]: About,
@@ -26,6 +28,7 @@ const PageByAppRouteName: Record<AppRouteName, () => ReactElement> = {
   [AppRouteName.Home]: Home,
   [AppRouteName.Project]: Project,
   [AppRouteName.Settings]: Settings,
+  [AppRouteName.Tools]: Tools,
 } as const;
 
 export default function AppNavigation(): ReactElement {
@@ -45,6 +48,11 @@ export default function AppNavigation(): ReactElement {
           icon={<CopyIcon />}
           label='Project'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Project }))}
+        />
+        <PageButton
+          icon={<LinkIcon />}
+          label='Tools'
+          onClick={() => dispatch(setAppRoute({ name: AppRouteName.Tools }))}
         />
         <PageButton
           icon={<SettingsIcon />}
