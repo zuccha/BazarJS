@@ -112,7 +112,7 @@ export default function ProjectCreationFromSource({
         </>
       }
       onClose={onClose}
-      title='Edit config'
+      title='New project'
     >
       <VStack width='100%' spacing={4}>
         <FormControl {...nameField.control}>
