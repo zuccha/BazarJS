@@ -1,16 +1,13 @@
-import { HStack } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import Content from './Content';
 import Sidebar from './Sidebar';
 
 export default function Project(): ReactElement {
   return (
-    <HStack
-      flex={1}
-      height='100%'
-      alignItems='flex-start'
-      justifyContent='flex-start'
-    >
+    <Flex flex={1} h='100%'>
       <Sidebar />
-    </HStack>
+      <Content />
+    </Flex>
   );
 }
