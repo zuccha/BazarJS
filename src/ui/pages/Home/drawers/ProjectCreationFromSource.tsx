@@ -11,9 +11,9 @@ import FormControl, {
   useFormField,
 } from '../../../../ui-atoms/input/FormControl';
 import TextInput from '../../../../ui-atoms/input/TextInput';
-import { SettingString } from '../../../../utils-electron/Settings.types';
+import { Setting } from '../../../../utils-electron/Settings.types';
 import {
-  getSettingString,
+  getSetting,
   prioritizeRecentProject,
 } from '../../../../store/slices/settings';
 import Drawer from '../../../../ui-atoms/overlay/Drawer';
@@ -36,7 +36,7 @@ export default function ProjectCreationFromSource({
   });
 
   const defaultAuthor = useSelector(
-    getSettingString(SettingString.NewProjectDefaultAuthor),
+    getSetting(Setting.NewProjectDefaultAuthor),
   );
   const authorField = useFormField({
     infoMessage: 'Author of the project.',
@@ -46,7 +46,7 @@ export default function ProjectCreationFromSource({
   });
 
   const defaultLocationDirPath = useSelector(
-    getSettingString(SettingString.NewProjectDefaultLocationDirPath),
+    getSetting(Setting.NewProjectDefaultLocationDirPath),
   );
   const locationDirPathField = useFormField({
     infoMessage: 'The project will be created in this directory.',
@@ -57,7 +57,7 @@ export default function ProjectCreationFromSource({
   });
 
   const defaultRomFilePath = useSelector(
-    getSettingString(SettingString.NewProjectDefaultRomFilePath),
+    getSetting(Setting.NewProjectDefaultRomFilePath),
   );
   const romFilePathField = useFormField({
     infoMessage: 'ROM used for the project (a copy will be made).',

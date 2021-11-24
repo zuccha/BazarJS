@@ -4,18 +4,12 @@ import {
   ReactElement,
   useImperativeHandle,
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  getSettingString,
-  setSettingString,
-} from '../../../../store/slices/settings';
 import BrowserInput from '../../../../ui-atoms/input/BrowserInput';
-import FormControl, {
-  useFormField,
-} from '../../../../ui-atoms/input/FormControl';
+import FormControl from '../../../../ui-atoms/input/FormControl';
 import TextInput from '../../../../ui-atoms/input/TextInput';
-import { SettingString } from '../../../../utils-electron/Settings.types';
+import { Setting } from '../../../../utils-electron/Settings.types';
 import SettingsGroup from '../SettingsGroup';
+import useSettingField from '../useSettingsField';
 
 const { $FileSystem } = window.api;
 
@@ -28,96 +22,70 @@ function NewProjectSettings(
   props: {},
   ref: ForwardedRef<NewProjectSettingsRef>,
 ): ReactElement {
-  const defaultAuthor = useSelector(
-    getSettingString(SettingString.NewProjectDefaultAuthor),
-  );
-  const defaultAuthorField = useFormField({
+  const author = useSettingField(Setting.NewProjectDefaultAuthor, {
     infoMessage: 'Default author for new projects',
-    initialValue: defaultAuthor,
     label: 'Default author',
   });
 
-  const defaultLocationDirPath = useSelector(
-    getSettingString(SettingString.NewProjectDefaultLocationDirPath),
+  const locationDirPath = useSettingField(
+    Setting.NewProjectDefaultLocationDirPath,
+    {
+      infoMessage: 'Default directory for new projects',
+      label: 'Default destination directory',
+      onValidate: $FileSystem.validateExistsDir,
+    },
   );
-  const defaultLocationDirPathField = useFormField({
-    infoMessage: 'Default directory for new projects',
-    initialValue: defaultLocationDirPath,
-    label: 'Default destination directory',
-    onValidate: $FileSystem.validateExistsDir,
-  });
 
-  const defaultRomFilePath = useSelector(
-    getSettingString(SettingString.NewProjectDefaultRomFilePath),
-  );
-  const defaultRomFilePathField = useFormField({
+  const romFilePath = useSettingField(Setting.NewProjectDefaultRomFilePath, {
     infoMessage: 'ROM used for the project (a copy will be made).',
-    initialValue: defaultRomFilePath,
     label: 'Default ROM file',
     onValidate: (value: string) =>
       $FileSystem.validateExistsFile(value) ||
       $FileSystem.validateHasExtension(value, '.smc'),
   });
 
-  const dispatch = useDispatch();
-
   useImperativeHandle(ref, () => ({
     save: () => {
-      dispatch(
-        setSettingString(
-          SettingString.NewProjectDefaultAuthor,
-          defaultAuthorField.value,
-        ),
-      );
-      dispatch(
-        setSettingString(
-          SettingString.NewProjectDefaultLocationDirPath,
-          defaultLocationDirPathField.value,
-        ),
-      );
-      dispatch(
-        setSettingString(
-          SettingString.NewProjectDefaultRomFilePath,
-          defaultRomFilePathField.value,
-        ),
-      );
+      author.save();
+      locationDirPath.save();
+      romFilePath.save();
     },
     reset: () => {
-      defaultAuthorField.handleChange(defaultAuthor);
-      defaultLocationDirPathField.handleChange(defaultLocationDirPath);
-      defaultRomFilePathField.handleChange(defaultRomFilePath);
+      author.reset();
+      locationDirPath.reset();
+      romFilePath.reset();
     },
   }));
 
   return (
     <SettingsGroup title='New project'>
-      <FormControl {...defaultAuthorField.control}>
+      <FormControl {...author.field.control}>
         <TextInput
-          onBlur={defaultAuthorField.handleBlur}
-          onChange={defaultAuthorField.handleChange}
-          placeholder={defaultAuthorField.control.label}
-          value={defaultAuthorField.value}
+          onBlur={author.field.handleBlur}
+          onChange={author.field.handleChange}
+          placeholder={author.field.control.label}
+          value={author.field.value}
         />
       </FormControl>
 
-      <FormControl {...defaultLocationDirPathField.control}>
+      <FormControl {...locationDirPath.field.control}>
         <BrowserInput
           mode='directory'
-          onBlur={defaultLocationDirPathField.handleBlur}
-          onChange={defaultLocationDirPathField.handleChange}
-          placeholder={defaultLocationDirPathField.control.label}
-          value={defaultLocationDirPathField.value}
+          onBlur={locationDirPath.field.handleBlur}
+          onChange={locationDirPath.field.handleChange}
+          placeholder={locationDirPath.field.control.label}
+          value={locationDirPath.field.value}
         />
       </FormControl>
 
-      <FormControl {...defaultRomFilePathField.control}>
+      <FormControl {...romFilePath.field.control}>
         <BrowserInput
           filters={[{ name: 'ROM', extensions: ['smc'] }]}
           mode='file'
-          onBlur={defaultRomFilePathField.handleBlur}
-          onChange={defaultRomFilePathField.handleChange}
-          placeholder={defaultRomFilePathField.control.label}
-          value={defaultRomFilePathField.value}
+          onBlur={romFilePath.field.handleBlur}
+          onChange={romFilePath.field.handleChange}
+          placeholder={romFilePath.field.control.label}
+          value={romFilePath.field.value}
         />
       </FormControl>
     </SettingsGroup>

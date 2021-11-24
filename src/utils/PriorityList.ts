@@ -1,6 +1,6 @@
 export interface PriorityList<T> {
-  size: number;
-  items: T[];
+  readonly size: number;
+  readonly items: T[];
 }
 
 export const $PriorityList = {

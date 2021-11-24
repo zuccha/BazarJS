@@ -6,12 +6,13 @@ import { AppDispatch } from '../../../store';
 import { openProject } from '../../../store/slices/core/slices/project';
 import { AppRouteName, setAppRoute } from '../../../store/slices/navigation';
 import {
-  getRecentProjects,
+  getSetting,
   prioritizeRecentProject,
   removeRecentProject,
 } from '../../../store/slices/settings';
 import Button from '../../../ui-atoms/input/Button';
 import FormError from '../../../ui-atoms/input/FormError';
+import { Setting } from '../../../utils-electron/Settings.types';
 import { ErrorReport } from '../../../utils/ErrorReport';
 
 const { $FileSystem } = window.api;
@@ -20,7 +21,7 @@ export default function RecentProjects(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const [openError, setOpenError] = useState<ErrorReport | undefined>();
 
-  const recentProjectDirPaths = useSelector(getRecentProjects());
+  const recentProjectDirPaths = useSelector(getSetting(Setting.RecentProjects));
 
   const handleOpenRecentProject = useCallback(
     (path: string) => {

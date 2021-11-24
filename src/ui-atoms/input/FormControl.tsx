@@ -45,7 +45,15 @@ export default function FormControl({
  * useFormField
  */
 
-interface FormField<T> {
+export interface FormFieldParams<T> {
+  infoMessage?: string;
+  initialValue: T;
+  isRequired?: boolean;
+  label: string;
+  onValidate?: (value: T) => ErrorReport | undefined;
+}
+
+export interface FormField<T> {
   control: {
     errorReport: ErrorReport | undefined;
     infoMessage: string | undefined;
@@ -65,13 +73,7 @@ export function useFormField<T>({
   isRequired = false,
   label,
   onValidate = () => undefined,
-}: {
-  infoMessage?: string;
-  initialValue: T;
-  isRequired?: boolean;
-  label: string;
-  onValidate?: (value: T) => ErrorReport | undefined;
-}): FormField<T> {
+}: FormFieldParams<T>): FormField<T> {
   const [value, setValue] = useState(initialValue);
   const [isDirty, setIsDirty] = useState(!!initialValue);
   const [errorReport, setErrorReport] = useState<ErrorReport | undefined>(
