@@ -1,5 +1,5 @@
 const makeScrollbarStyle = (color: string) => ({
-  'border-right': `8px solid ${color}`,
+  borderRight: `8px solid ${color}`,
 });
 
 const styles = {
