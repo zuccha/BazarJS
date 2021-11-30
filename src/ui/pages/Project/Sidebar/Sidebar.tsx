@@ -2,12 +2,12 @@ import { ReactElement, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../../store';
 import {
-  getProjectConfig,
-  setProjectConfig,
+  getProjectInfo,
+  setProjectInfo,
 } from '../../../../store/slices/core/slices/project';
-import Config from './Config';
+import Info from './Info';
 
-const defaultConfig = {
+const defaultInfo = {
   name: 'No project',
   author: '',
 };
@@ -15,19 +15,15 @@ const defaultConfig = {
 export default function Sidebar(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
 
-  const config = useSelector(getProjectConfig());
-  const editConfig = useCallback(
+  const info = useSelector(getProjectInfo());
+  const editInfo = useCallback(
     (newConfig) => {
-      dispatch(setProjectConfig(newConfig));
+      dispatch(setProjectInfo(newConfig));
     },
     [dispatch],
   );
 
   return (
-    <Config
-      config={config ?? defaultConfig}
-      isDisabled={!config}
-      onEdit={editConfig}
-    />
+    <Info info={info ?? defaultInfo} isDisabled={!info} onEdit={editInfo} />
   );
 }

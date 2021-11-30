@@ -4,15 +4,15 @@ import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 
 const { $FileSystem } = window.api;
 
-const ProjectConfigSchema = z.object({
+const ProjectInfoSchema = z.object({
   name: z.string(),
   author: z.string(),
 });
 
-export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
+export type ProjectInfo = z.infer<typeof ProjectInfoSchema>;
 
 export interface Project {
-  config: ProjectConfig;
+  info: ProjectInfo;
   directory: string;
 }
 
@@ -20,7 +20,7 @@ export const $Project = {
   // Constants
 
   ROM_FILE_NAME: 'rom.smc',
-  CONFIG_FILE_NAME: 'config.json',
+  INFO_FILE_NAME: 'info.json',
 
   // Constructors
 
@@ -76,15 +76,15 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    const config = { name, author };
-    if ((error = $Project.saveConfig(directory, config))) {
+    const info = { name, author };
+    if ((error = $Project.saveInfo(directory, info))) {
       $FileSystem.removePath(directory);
-      const errorMessage = `${errorPrefix}: failed to save config`;
+      const errorMessage = `${errorPrefix}: failed to save info`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
     return $EitherErrorOr.value({
-      config,
+      info,
       directory,
     });
   },
@@ -104,67 +104,55 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    const config = $Project.loadConfig(directory);
-    if (config.isError) {
-      const errorMessage = `${errorPrefix}: failed to load config`;
-      return $EitherErrorOr.error(config.error.extend(errorMessage));
+    const info = $Project.loadInfo(directory);
+    if (info.isError) {
+      const errorMessage = `${errorPrefix}: failed to load info`;
+      return $EitherErrorOr.error(info.error.extend(errorMessage));
     }
 
     return $EitherErrorOr.value({
-      config: config.value,
+      info: info.value,
       directory,
     });
   },
 
   // Methods
 
-  getConfig: (project: Project): ProjectConfig => project.config,
+  getInfo: (project: Project): ProjectInfo => project.info,
 
-  setConfig: (
-    project: Project,
-    config: ProjectConfig,
-  ): EitherErrorOr<Project> => {
-    const error = $Project.saveConfig(project.directory, config);
+  setInfo: (project: Project, info: ProjectInfo): EitherErrorOr<Project> => {
+    const error = $Project.saveInfo(project.directory, info);
     return error
       ? $EitherErrorOr.error(error)
-      : $EitherErrorOr.value({ ...project, config });
+      : $EitherErrorOr.value({ ...project, info });
   },
 
   // Utils
 
-  loadConfig: (directory: string): EitherErrorOr<ProjectConfig> => {
-    const errorPrefix = 'Could not load project config';
+  loadInfo: (directory: string): EitherErrorOr<ProjectInfo> => {
+    const errorPrefix = 'Could not load project info';
 
-    const configFilePath = $FileSystem.join(
-      directory,
-      $Project.CONFIG_FILE_NAME,
-    );
-    const configOrError = $FileSystem.loadJson(configFilePath);
-    if (configOrError.isError) {
-      const errorMessage = `${errorPrefix}: failed to load config file`;
-      return $EitherErrorOr.error(configOrError.error.extend(errorMessage));
+    const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
+    const infoOrError = $FileSystem.loadJson(infoFilePath);
+    if (infoOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to load info file`;
+      return $EitherErrorOr.error(infoOrError.error.extend(errorMessage));
     }
 
-    const config = ProjectConfigSchema.safeParse(configOrError.value);
-    if (!config.success) {
-      const errorMessage = `${errorPrefix}: config object is not valid`;
+    const info = ProjectInfoSchema.safeParse(infoOrError.value);
+    if (!info.success) {
+      const errorMessage = `${errorPrefix}: info object is not valid`;
       return $EitherErrorOr.error($ErrorReport.make(errorMessage));
     }
 
-    return $EitherErrorOr.value(config.data);
+    return $EitherErrorOr.value(info.data);
   },
 
-  saveConfig: (
-    directory: string,
-    config: ProjectConfig,
-  ): ErrorReport | undefined => {
-    const configFilePath = $FileSystem.join(
-      directory,
-      $Project.CONFIG_FILE_NAME,
-    );
-    const error = $FileSystem.saveJson(configFilePath, config);
+  saveInfo: (directory: string, info: ProjectInfo): ErrorReport | undefined => {
+    const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
+    const error = $FileSystem.saveJson(infoFilePath, info);
     if (error) {
-      const errorMessage = `Could not save project config`;
+      const errorMessage = `Could not save project info`;
       return error.extend(errorMessage);
     }
   },

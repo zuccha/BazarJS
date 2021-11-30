@@ -1,6 +1,6 @@
 import { Alert, AlertIcon, Box, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
-import { ProjectConfig } from '../../../../core/Project';
+import { ProjectInfo } from '../../../../core/Project';
 import Button from '../../../../ui-atoms/input/Button';
 import FormControl, {
   useForm,
@@ -11,20 +11,20 @@ import Drawer from '../../../../ui-atoms/overlay/Drawer';
 
 const { $FileSystem } = window.api;
 
-interface ConfigEditorProps {
-  config: ProjectConfig;
+interface Info {
+  info: ProjectInfo;
   onCancel: () => void;
-  onConfirm: (config: ProjectConfig) => void;
+  onConfirm: (config: ProjectInfo) => void;
 }
 
 export default function ConfigEditor({
-  config,
+  info,
   onCancel,
   onConfirm,
-}: ConfigEditorProps): ReactElement {
+}: Info): ReactElement {
   const nameField = useFormField({
     infoMessage: 'This is the name of the project',
-    initialValue: config.name,
+    initialValue: info.name,
     isRequired: true,
     label: 'Project name',
     onValidate: $FileSystem.validateIsValidName,
@@ -32,7 +32,7 @@ export default function ConfigEditor({
 
   const authorField = useFormField({
     infoMessage: 'Author of the project',
-    initialValue: config.author,
+    initialValue: info.author,
     isRequired: false,
     label: 'Author',
   });

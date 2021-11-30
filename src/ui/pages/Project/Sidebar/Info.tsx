@@ -1,21 +1,21 @@
 import { EditIcon } from '@chakra-ui/icons';
 import { Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { ReactElement, useState } from 'react';
-import { ProjectConfig } from '../../../../core/Project';
+import { ProjectInfo } from '../../../../core/Project';
 import IconButton from '../../../../ui-atoms/input/IconButton';
-import ConfigEditor from './ConfigEditor';
+import InfoEditor from './InfoEditor';
 
-interface ConfigProps {
-  config: ProjectConfig;
+interface InfoProps {
+  info: ProjectInfo;
   isDisabled: boolean;
-  onEdit: (config: ProjectConfig) => void;
+  onEdit: (config: ProjectInfo) => void;
 }
 
-export default function Config({
-  config,
+export default function Info({
+  info,
   isDisabled,
   onEdit,
-}: ConfigProps): ReactElement {
+}: InfoProps): ReactElement {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ export default function Config({
             size='sm'
             fontStyle={isDisabled ? 'italic' : undefined}
           >
-            {config.name}
+            {info.name}
           </Heading>
           <IconButton
             icon={<EditIcon />}
@@ -47,12 +47,12 @@ export default function Config({
         </Flex>
 
         <VStack spacing={1} alignItems='flex-start'>
-          <Text fontSize={14}>Author: {config.author || '-'}</Text>
+          <Text fontSize={14}>Author: {info.author || '-'}</Text>
         </VStack>
       </VStack>
       {isEditorOpen && (
-        <ConfigEditor
-          config={config}
+        <InfoEditor
+          info={info}
           onCancel={() => setIsEditorOpen(false)}
           onConfirm={(newConfig) => {
             setIsEditorOpen(false);
