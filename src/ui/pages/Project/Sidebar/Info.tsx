@@ -20,13 +20,7 @@ export default function Info({
 
   return (
     <>
-      <VStack
-        bg='app.bg2'
-        w='256px'
-        height='100%'
-        p={6}
-        alignItems='flex-start'
-      >
+      <VStack width='100%' alignItems='flex-start'>
         <Flex alignItems='center' width='100%'>
           <Heading
             flex={1}
