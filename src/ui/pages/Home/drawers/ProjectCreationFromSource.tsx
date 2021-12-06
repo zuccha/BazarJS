@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, VStack } from '@chakra-ui/react';
+import { Alert, AlertIcon, Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../../store';
@@ -17,6 +17,7 @@ import {
   prioritizeRecentProject,
 } from '../../../../store/slices/settings';
 import Drawer from '../../../../ui-atoms/overlay/Drawer';
+import FormError from '../../../../ui-atoms/input/FormError';
 
 const { $FileSystem } = window.api;
 
@@ -114,52 +115,56 @@ export default function ProjectCreationFromSource({
       onClose={onClose}
       title='New project'
     >
-      <VStack width='100%' spacing={4}>
-        <FormControl {...nameField.control}>
-          <TextInput
-            onBlur={nameField.handleBlur}
-            onChange={nameField.handleChange}
-            placeholder={nameField.control.label}
-            value={nameField.value}
-          />
-        </FormControl>
+      <Flex direction='column' h='100%'>
+        <VStack width='100%' spacing={4} flex={1}>
+          <FormControl {...nameField.control}>
+            <TextInput
+              onBlur={nameField.handleBlur}
+              onChange={nameField.handleChange}
+              placeholder={nameField.control.label}
+              value={nameField.value}
+            />
+          </FormControl>
 
-        <FormControl {...authorField.control}>
-          <TextInput
-            onBlur={authorField.handleBlur}
-            onChange={authorField.handleChange}
-            placeholder={authorField.control.label}
-            value={authorField.value}
-          />
-        </FormControl>
+          <FormControl {...authorField.control}>
+            <TextInput
+              onBlur={authorField.handleBlur}
+              onChange={authorField.handleChange}
+              placeholder={authorField.control.label}
+              value={authorField.value}
+            />
+          </FormControl>
 
-        <FormControl {...locationDirPathField.control}>
-          <BrowserInput
-            mode='directory'
-            onBlur={locationDirPathField.handleBlur}
-            onChange={locationDirPathField.handleChange}
-            placeholder={locationDirPathField.control.label}
-            value={locationDirPathField.value}
-          />
-        </FormControl>
+          <FormControl {...locationDirPathField.control}>
+            <BrowserInput
+              mode='directory'
+              onBlur={locationDirPathField.handleBlur}
+              onChange={locationDirPathField.handleChange}
+              placeholder={locationDirPathField.control.label}
+              value={locationDirPathField.value}
+            />
+          </FormControl>
 
-        <FormControl {...romFilePathField.control}>
-          <BrowserInput
-            filters={[{ name: 'ROM', extensions: ['smc'] }]}
-            mode='file'
-            onBlur={romFilePathField.handleBlur}
-            onChange={romFilePathField.handleChange}
-            placeholder={romFilePathField.control.label}
-            value={romFilePathField.value}
-          />
-        </FormControl>
+          <FormControl {...romFilePathField.control}>
+            <BrowserInput
+              filters={[{ name: 'ROM', extensions: ['smc'] }]}
+              mode='file'
+              onBlur={romFilePathField.handleBlur}
+              onChange={romFilePathField.handleChange}
+              placeholder={romFilePathField.control.label}
+              value={romFilePathField.value}
+            />
+          </FormControl>
 
-        <Alert status='info'>
-          <AlertIcon />A new directory named after the chosen project name will
-          be created in the selected location, containing a copy of the base ROM
-          and generated files.
-        </Alert>
-      </VStack>
+          <Alert status='info'>
+            <AlertIcon />A new directory named after the chosen project name
+            will be created in the selected location, containing a copy of the
+            base ROM and generated files.
+          </Alert>
+        </VStack>
+
+        {form.error && <FormError errorReport={form.error} />}
+      </Flex>
     </Drawer>
   );
 }
