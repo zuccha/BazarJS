@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
+import { $ProjectSnapshot, ProjectSnapshot } from './ProjectSnapshot';
 
 const { $FileSystem } = window.api;
 
@@ -14,6 +15,9 @@ export type ProjectInfo = z.infer<typeof ProjectInfoSchema>;
 export interface Project {
   info: ProjectInfo;
   directory: string;
+
+  latest: ProjectSnapshot;
+  backups: ProjectSnapshot[];
 }
 
 export const $Project = {
@@ -21,6 +25,8 @@ export const $Project = {
 
   ROM_FILE_NAME: 'rom.smc',
   INFO_FILE_NAME: 'info.json',
+  LATEST_SNAPSHOT_DIR_NAME: 'latest',
+  BACKUPS_DIR_NAME: 'backups',
 
   // Constructors
 
@@ -40,6 +46,7 @@ export const $Project = {
 
     const directory = $FileSystem.join(locationDirPath, name);
 
+    // Validation
     if ((error = $FileSystem.validateIsValidName(name))) {
       const errorMessage = `${errorPrefix}: name is not valid`;
       return $EitherErrorOr.error(error.extend(errorMessage));
@@ -60,11 +67,13 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
+    // Create directory
     if ((error = $FileSystem.createDirectory(directory))) {
       const errorMessage = `${errorPrefix}: failed to create directory`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
+    // Copy ROM file
     if (
       (error = $FileSystem.copyFile(
         romFilePath,
@@ -76,6 +85,7 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
+    // Create info file
     const info = { name, author };
     if ((error = $Project.saveInfo(directory, info))) {
       $FileSystem.removePath(directory);
@@ -83,9 +93,35 @@ export const $Project = {
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
+    // Create latest snapshot
+    const latest = $ProjectSnapshot.create({
+      name: $Project.LATEST_SNAPSHOT_DIR_NAME,
+      locationDirPath: directory,
+    });
+    if (latest.isError) {
+      $FileSystem.removePath(directory);
+      const errorMessage = `${errorPrefix}: failed to create latest snapshot`;
+      return $EitherErrorOr.error(latest.error.extend(errorMessage));
+    }
+
+    // Create backups
+    const backupsDirectory = $FileSystem.join(
+      directory,
+      $Project.BACKUPS_DIR_NAME,
+    );
+    const backups: ProjectSnapshot[] = [];
+    if ((error = $FileSystem.createDirectory(backupsDirectory))) {
+      $FileSystem.removePath(directory);
+      const errorMessage = `${errorPrefix}: failed to create backups directory`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
+
+    // Create project
     return $EitherErrorOr.value({
       info,
       directory,
+      latest: latest.value,
+      backups,
     });
   },
 
@@ -110,9 +146,23 @@ export const $Project = {
       return $EitherErrorOr.error(info.error.extend(errorMessage));
     }
 
+    const latestDirectory = $FileSystem.join(
+      directory,
+      $Project.LATEST_SNAPSHOT_DIR_NAME,
+    );
+    const latest = $ProjectSnapshot.open({ directory: latestDirectory });
+    if (latest.isError) {
+      const errorMessage = `${errorPrefix}: failed to open latest snapshot`;
+      return $EitherErrorOr.error(latest.error.extend(errorMessage));
+    }
+
+    const backups: ProjectSnapshot[] = [];
+
     return $EitherErrorOr.value({
       info: info.value,
       directory,
+      latest: latest.value,
+      backups,
     });
   },
 
