@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { $DateTime } from '../utils/DateTime';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
-import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
+import { ErrorReport } from '../utils/ErrorReport';
+import { $Serialization } from '../utils/Serialization';
 
 const { $FileSystem } = window.api;
 
@@ -98,25 +99,19 @@ export const $ProjectSnapshot = {
   // Utils
 
   loadInfo: (directory: string): EitherErrorOr<ProjectSnapshotInfo> => {
-    const errorPrefix = 'Could not load project snapshot info';
-
     const infoFilePath = $FileSystem.join(
       directory,
       $ProjectSnapshot.INFO_FILE_NAME,
     );
-    const infoOrError = $FileSystem.loadJson(infoFilePath);
-    if (infoOrError.isError) {
-      const errorMessage = `${errorPrefix}: failed to load info file`;
-      return $EitherErrorOr.error(infoOrError.error.extend(errorMessage));
+    const dataOrError = $Serialization.load(
+      infoFilePath,
+      ProjectSnapshotInfoSchema,
+    );
+    if (dataOrError.isError) {
+      const errorMessage = 'Could not load project snapshot info';
+      return $EitherErrorOr.error(dataOrError.error.extend(errorMessage));
     }
-
-    const info = ProjectSnapshotInfoSchema.safeParse(infoOrError.value);
-    if (!info.success) {
-      const errorMessage = `${errorPrefix}: info object is not valid`;
-      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
-    }
-
-    return $EitherErrorOr.value(info.data);
+    return dataOrError;
   },
 
   saveInfo: (
@@ -127,7 +122,7 @@ export const $ProjectSnapshot = {
       directory,
       $ProjectSnapshot.INFO_FILE_NAME,
     );
-    const error = $FileSystem.saveJson(infoFilePath, info);
+    const error = $Serialization.save(infoFilePath, info);
     if (error) {
       const errorMessage = `Could not save project snapshot info`;
       return error.extend(errorMessage);

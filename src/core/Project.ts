@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
-import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
+import { ErrorReport } from '../utils/ErrorReport';
+import { $Serialization } from '../utils/Serialization';
 import { $ProjectSnapshot, ProjectSnapshot } from './ProjectSnapshot';
 
 const { $FileSystem } = window.api;
@@ -180,27 +181,18 @@ export const $Project = {
   // Utils
 
   loadInfo: (directory: string): EitherErrorOr<ProjectInfo> => {
-    const errorPrefix = 'Could not load project info';
-
     const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
-    const infoOrError = $FileSystem.loadJson(infoFilePath);
-    if (infoOrError.isError) {
-      const errorMessage = `${errorPrefix}: failed to load info file`;
-      return $EitherErrorOr.error(infoOrError.error.extend(errorMessage));
+    const dataOrError = $Serialization.load(infoFilePath, ProjectInfoSchema);
+    if (dataOrError.isError) {
+      const errorMessage = 'Could not load project info';
+      return $EitherErrorOr.error(dataOrError.error.extend(errorMessage));
     }
-
-    const info = ProjectInfoSchema.safeParse(infoOrError.value);
-    if (!info.success) {
-      const errorMessage = `${errorPrefix}: info object is not valid`;
-      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
-    }
-
-    return $EitherErrorOr.value(info.data);
+    return dataOrError;
   },
 
   saveInfo: (directory: string, info: ProjectInfo): ErrorReport | undefined => {
     const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
-    const error = $FileSystem.saveJson(infoFilePath, info);
+    const error = $Serialization.save(infoFilePath, info);
     if (error) {
       const errorMessage = `Could not save project info`;
       return error.extend(errorMessage);
