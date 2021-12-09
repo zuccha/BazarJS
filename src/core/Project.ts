@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { $IResource, IResource } from '../core-interfaces/IResource';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { ErrorReport } from '../utils/ErrorReport';
-import { $Serialization } from '../utils/Serialization';
 import { $ProjectSnapshot, ProjectSnapshot } from './ProjectSnapshot';
 
 const { $FileSystem } = window.api;
+
+// Resource
 
 const ProjectInfoSchema = z.object({
   name: z.string(),
@@ -13,21 +15,26 @@ const ProjectInfoSchema = z.object({
 
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>;
 
-export interface Project {
-  info: ProjectInfo;
-  directory: string;
+const $Resource = $IResource.implement({
+  label: 'project',
+  infoSchema: ProjectInfoSchema,
+});
 
+// Project
+
+export interface Project extends IResource<ProjectInfo> {
   latest: ProjectSnapshot;
   backups: ProjectSnapshot[];
 }
 
-export const $Project = {
-  // Constants
+const ROM_FILE_NAME = 'rom.smc';
+const LATEST_SNAPSHOT_DIR_NAME = 'latest';
+const BACKUPS_DIR_NAME = 'backups';
 
-  ROM_FILE_NAME: 'rom.smc',
-  INFO_FILE_NAME: 'info.json',
-  LATEST_SNAPSHOT_DIR_NAME: 'latest',
-  BACKUPS_DIR_NAME: 'backups',
+export const $Project = {
+  // Inheritance
+
+  ...$Resource.Instance,
 
   // Constructors
 
@@ -45,82 +52,52 @@ export const $Project = {
     const errorPrefix = 'Could not create project';
     let error: ErrorReport | undefined;
 
-    const directory = $FileSystem.join(locationDirPath, name);
-
-    // Validation
-    if ((error = $FileSystem.validateIsValidName(name))) {
-      const errorMessage = `${errorPrefix}: name is not valid`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
+    const info = { name, author };
+    const resourceOrError = $Resource.Ctor.create(locationDirPath, name, info);
+    if (resourceOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create resource`;
+      return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
-
-    if ((error = $FileSystem.validateExistsDir(locationDirPath))) {
-      const errorMessage = `${errorPrefix}: location does not exist`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    if ((error = $FileSystem.validateNotExists(directory))) {
-      const errorMessage = `${errorPrefix}: project already exists`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    if ((error = $FileSystem.validateExistsFile(romFilePath))) {
-      const errorMessage = `${errorPrefix}: ROM file does not exist`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    // Create directory
-    if ((error = $FileSystem.createDirectory(directory))) {
-      const errorMessage = `${errorPrefix}: failed to create directory`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
+    const resource = resourceOrError.value;
 
     // Copy ROM file
     if (
       (error = $FileSystem.copyFile(
         romFilePath,
-        $FileSystem.join(directory, $Project.ROM_FILE_NAME),
+        $FileSystem.join(resource.directoryPath, ROM_FILE_NAME),
       ))
     ) {
-      $FileSystem.removePath(directory);
+      $Resource.Dtor.remove(resource);
       const errorMessage = `${errorPrefix}: failed to copy ROM file`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    // Create info file
-    const info = { name, author };
-    if ((error = $Project.saveInfo(directory, info))) {
-      $FileSystem.removePath(directory);
-      const errorMessage = `${errorPrefix}: failed to save info`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
     // Create latest snapshot
     const latest = $ProjectSnapshot.create({
-      name: $Project.LATEST_SNAPSHOT_DIR_NAME,
-      locationDirPath: directory,
+      locationDirPath: resource.directoryPath,
+      name: LATEST_SNAPSHOT_DIR_NAME,
     });
     if (latest.isError) {
-      $FileSystem.removePath(directory);
+      $Resource.Dtor.remove(resource);
       const errorMessage = `${errorPrefix}: failed to create latest snapshot`;
       return $EitherErrorOr.error(latest.error.extend(errorMessage));
     }
 
     // Create backups
     const backupsDirectory = $FileSystem.join(
-      directory,
-      $Project.BACKUPS_DIR_NAME,
+      resource.directoryPath,
+      BACKUPS_DIR_NAME,
     );
     const backups: ProjectSnapshot[] = [];
     if ((error = $FileSystem.createDirectory(backupsDirectory))) {
-      $FileSystem.removePath(directory);
+      $Resource.Dtor.remove(resource);
       const errorMessage = `${errorPrefix}: failed to create backups directory`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
     // Create project
     return $EitherErrorOr.value({
-      info,
-      directory,
+      ...resource,
       latest: latest.value,
       backups,
     });
@@ -130,26 +107,22 @@ export const $Project = {
     const errorPrefix = 'Could not open project';
     let error: ErrorReport | undefined;
 
-    if ((error = $FileSystem.validateExistsDir(directory))) {
-      const errorMessage = `${errorPrefix}: directory does not exist`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
+    const resourceOrError = $Resource.Ctor.open(directory);
+    if (resourceOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create info`;
+      return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
+    const resource = resourceOrError.value;
 
-    const romFilePath = $FileSystem.join(directory, $Project.ROM_FILE_NAME);
+    const romFilePath = $FileSystem.join(directory, ROM_FILE_NAME);
     if ((error = $FileSystem.validateExistsFile(romFilePath))) {
       const errorMessage = `${errorPrefix}: ROM file does not exist`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    const info = $Project.loadInfo(directory);
-    if (info.isError) {
-      const errorMessage = `${errorPrefix}: failed to load info`;
-      return $EitherErrorOr.error(info.error.extend(errorMessage));
-    }
-
     const latestDirectory = $FileSystem.join(
       directory,
-      $Project.LATEST_SNAPSHOT_DIR_NAME,
+      LATEST_SNAPSHOT_DIR_NAME,
     );
     const latest = $ProjectSnapshot.open({ directory: latestDirectory });
     if (latest.isError) {
@@ -160,42 +133,9 @@ export const $Project = {
     const backups: ProjectSnapshot[] = [];
 
     return $EitherErrorOr.value({
-      info: info.value,
-      directory,
+      ...resource,
       latest: latest.value,
       backups,
     });
-  },
-
-  // Methods
-
-  getInfo: (project: Project): ProjectInfo => project.info,
-
-  setInfo: (project: Project, info: ProjectInfo): EitherErrorOr<Project> => {
-    const error = $Project.saveInfo(project.directory, info);
-    return error
-      ? $EitherErrorOr.error(error)
-      : $EitherErrorOr.value({ ...project, info });
-  },
-
-  // Utils
-
-  loadInfo: (directory: string): EitherErrorOr<ProjectInfo> => {
-    const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
-    const dataOrError = $Serialization.load(infoFilePath, ProjectInfoSchema);
-    if (dataOrError.isError) {
-      const errorMessage = 'Could not load project info';
-      return $EitherErrorOr.error(dataOrError.error.extend(errorMessage));
-    }
-    return dataOrError;
-  },
-
-  saveInfo: (directory: string, info: ProjectInfo): ErrorReport | undefined => {
-    const infoFilePath = $FileSystem.join(directory, $Project.INFO_FILE_NAME);
-    const error = $Serialization.save(infoFilePath, info);
-    if (error) {
-      const errorMessage = `Could not save project info`;
-      return error.extend(errorMessage);
-    }
   },
 };

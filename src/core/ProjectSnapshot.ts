@@ -1,10 +1,9 @@
 import { z } from 'zod';
+import { $IResource, IResource } from '../core-interfaces/IResource';
 import { $DateTime } from '../utils/DateTime';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
-import { ErrorReport } from '../utils/ErrorReport';
-import { $Serialization } from '../utils/Serialization';
 
-const { $FileSystem } = window.api;
+// Resource
 
 const ProjectSnapshotInfoSchema = z.object({
   creationDate: z.string().refine($DateTime.isISODate),
@@ -12,52 +11,43 @@ const ProjectSnapshotInfoSchema = z.object({
 
 export type ProjectSnapshotInfo = z.infer<typeof ProjectSnapshotInfoSchema>;
 
-export interface ProjectSnapshot {
-  info: ProjectSnapshotInfo;
-  directory: string;
+const $Resource = $IResource.implement({
+  label: 'project snapshot',
+  infoSchema: ProjectSnapshotInfoSchema,
+});
+
+// ProjectSnapshot
+
+export interface ProjectSnapshot extends IResource<ProjectSnapshotInfo> {
+  // patches: Patch[];
 }
 
 export const $ProjectSnapshot = {
-  // Constants
+  // Inheritance
 
-  INFO_FILE_NAME: 'info.json',
+  ...$Resource.Instance,
 
   // Constructors
 
   create: ({
-    name,
     locationDirPath,
+    name,
   }: {
-    name: string;
     locationDirPath: string;
+    name: string;
   }): EitherErrorOr<ProjectSnapshot> => {
     const errorPrefix = 'Could not create project snapshot';
-    let error: ErrorReport | undefined;
 
-    const directory = $FileSystem.join(locationDirPath, name);
-
-    // Validation
-    if ((error = $FileSystem.validateNotExists(directory))) {
-      const errorMessage = `${errorPrefix}: snapshot already exists`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    // Create directory
-    if ((error = $FileSystem.createDirectory(directory))) {
-      const errorMessage = `${errorPrefix}: failed to create directory`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    // Create info file
     const info = { creationDate: new Date().toISOString() };
-    if ((error = $ProjectSnapshot.saveInfo(directory, info))) {
-      $FileSystem.removePath(directory);
-      const errorMessage = `${errorPrefix}: failed to save info`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
+    const resourceOrError = $Resource.Ctor.create(locationDirPath, name, info);
+    if (resourceOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create resource`;
+      return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
 
     // Instantiate snapshot
-    return $EitherErrorOr.value({ info, directory });
+    const resource = resourceOrError.value;
+    return $EitherErrorOr.value({ ...resource });
   },
 
   open: ({
@@ -65,67 +55,16 @@ export const $ProjectSnapshot = {
   }: {
     directory: string;
   }): EitherErrorOr<ProjectSnapshot> => {
-    const errorPrefix = 'Could not open project snapshot';
-    let error: ErrorReport | undefined;
+    const errorPrefix = 'Could not create project snapshot';
 
-    if ((error = $FileSystem.validateExistsDir(directory))) {
-      const errorMessage = `${errorPrefix}: directory does not exist`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
+    const resourceOrError = $Resource.Ctor.open(directory);
+    if (resourceOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create info`;
+      return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
+    const resource = resourceOrError.value;
 
-    const info = $ProjectSnapshot.loadInfo(directory);
-    if (info.isError) {
-      const errorMessage = `${errorPrefix}: failed to load info`;
-      return $EitherErrorOr.error(info.error.extend(errorMessage));
-    }
-
-    return $EitherErrorOr.value({ info: info.value, directory });
-  },
-
-  // Methods
-
-  getInfo: (project: ProjectSnapshot): ProjectSnapshotInfo => project.info,
-
-  setInfo: (
-    project: ProjectSnapshot,
-    info: ProjectSnapshotInfo,
-  ): EitherErrorOr<ProjectSnapshot> => {
-    const error = $ProjectSnapshot.saveInfo(project.directory, info);
-    return error
-      ? $EitherErrorOr.error(error)
-      : $EitherErrorOr.value({ ...project, info });
-  },
-
-  // Utils
-
-  loadInfo: (directory: string): EitherErrorOr<ProjectSnapshotInfo> => {
-    const infoFilePath = $FileSystem.join(
-      directory,
-      $ProjectSnapshot.INFO_FILE_NAME,
-    );
-    const dataOrError = $Serialization.load(
-      infoFilePath,
-      ProjectSnapshotInfoSchema,
-    );
-    if (dataOrError.isError) {
-      const errorMessage = 'Could not load project snapshot info';
-      return $EitherErrorOr.error(dataOrError.error.extend(errorMessage));
-    }
-    return dataOrError;
-  },
-
-  saveInfo: (
-    directory: string,
-    info: ProjectSnapshotInfo,
-  ): ErrorReport | undefined => {
-    const infoFilePath = $FileSystem.join(
-      directory,
-      $ProjectSnapshot.INFO_FILE_NAME,
-    );
-    const error = $Serialization.save(infoFilePath, info);
-    if (error) {
-      const errorMessage = `Could not save project snapshot info`;
-      return error.extend(errorMessage);
-    }
+    // Instantiate snapshot
+    return $EitherErrorOr.value({ ...resource });
   },
 };
