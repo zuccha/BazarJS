@@ -32,7 +32,7 @@ export default function Actions(): ReactElement {
     if (!path) {
       return;
     }
-    const error = dispatch(openProject({ directory: path }));
+    const error = dispatch(openProject({ directoryPath: path }));
     if (error) {
       setOpenError(error);
     } else {

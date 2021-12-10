@@ -1,14 +1,64 @@
-import fs from 'fs';
-import path from 'path';
+import FS from 'fs';
+import Path from 'path';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 
 export const $FileSystem = {
-  basename: path.basename,
+  basename: Path.basename,
+
+  computeRelativePath: (basePath: string, targetPath: string): string => {
+    const normalizedBasePath = Path.normalize(basePath);
+    const normalizedTargetPath = Path.normalize(targetPath);
+    return normalizedTargetPath.startsWith(normalizedBasePath)
+      ? normalizedTargetPath.replace(normalizedBasePath, '')
+      : normalizedTargetPath;
+  },
+
+  copyDirectory: (
+    sourceDirPath: string,
+    targetDirPath: string,
+    isRecursive: boolean = false,
+  ): ErrorReport | undefined => {
+    try {
+      // Create directory if it doesn't exist.
+      const sourceDitExist = FS.existsSync(sourceDirPath);
+      if (!sourceDitExist) {
+        FS.mkdirSync(sourceDirPath);
+      }
+
+      // Copy files.
+      const fileNames = $FileSystem.getFileNames(sourceDirPath);
+      for (const fileName of fileNames) {
+        const sourceFilePath = Path.join(sourceDirPath, fileName);
+        const targetFilePath = Path.join(targetDirPath, fileName);
+        FS.copyFileSync(sourceFilePath, targetFilePath);
+      }
+
+      if (isRecursive) {
+        const subDirNames = $FileSystem.getDirNames(sourceDirPath);
+        for (const subDirName of subDirNames) {
+          const sourceSubDirPath = Path.join(sourceDirPath, subDirName);
+          const targetSubDirPath = Path.join(targetDirPath, subDirName);
+          const maybeError = $FileSystem.copyDirectory(
+            sourceSubDirPath,
+            targetSubDirPath,
+            true,
+          );
+          if (maybeError) {
+            return maybeError;
+          }
+        }
+      }
+    } catch (error) {
+      return $ErrorReport.make(
+        `Copy directory failed: failed to copy directory "${sourceDirPath}" to "${targetDirPath}"`,
+      );
+    }
+  },
 
   copyFile: (sourcePath: string, targetPath: string) => {
     try {
-      fs.copyFileSync(sourcePath, targetPath);
+      FS.copyFileSync(sourcePath, targetPath);
     } catch (error) {
       return $ErrorReport.make(
         `Failed to copy file from "${sourcePath}" to "${targetPath}"`,
@@ -18,17 +68,31 @@ export const $FileSystem = {
 
   createDirectory: (path: string): ErrorReport | undefined => {
     try {
-      fs.mkdirSync(path);
+      FS.mkdirSync(path);
     } catch {
       return $ErrorReport.make(`Failed to create directory "${path}"`);
     }
   },
 
-  join: path.join,
+  getDirNames: (directoryPath: string): string[] => {
+    const filesAndDirs = FS.readdirSync(directoryPath);
+    return filesAndDirs.filter((name) =>
+      FS.statSync(Path.join(directoryPath, name)).isDirectory(),
+    );
+  },
+
+  getFileNames: (directoryPath: string): string[] => {
+    const filesAndDirs = FS.readdirSync(directoryPath);
+    return filesAndDirs.filter(
+      (name) => !FS.statSync(Path.join(directoryPath, name)).isDirectory(),
+    );
+  },
+
+  join: Path.join,
 
   loadJson: (path: string): EitherErrorOr<unknown> => {
     try {
-      return $EitherErrorOr.value(JSON.parse(fs.readFileSync(path, 'utf8')));
+      return $EitherErrorOr.value(JSON.parse(FS.readFileSync(path, 'utf8')));
     } catch {
       const errorMessage = `Failed to load JSON file "${path}"`;
       return $EitherErrorOr.error($ErrorReport.make(errorMessage));
@@ -37,7 +101,7 @@ export const $FileSystem = {
 
   removePath: (path: string): ErrorReport | undefined => {
     try {
-      fs.rmSync(path, { recursive: true });
+      FS.rmSync(path, { recursive: true });
     } catch {
       return $ErrorReport.make(`Failed to delete path "${path}"`);
     }
@@ -45,7 +109,7 @@ export const $FileSystem = {
 
   saveJson: (path: string, data: unknown): ErrorReport | undefined => {
     try {
-      fs.writeFileSync(path, JSON.stringify(data, null, 2));
+      FS.writeFileSync(path, JSON.stringify(data, null, 2));
     } catch (error) {
       return $ErrorReport.make(`Failed to save JSON file "${path}"`);
     }
@@ -55,9 +119,9 @@ export const $FileSystem = {
     const errorPrefix = 'Directory does not exist';
     return !path
       ? $ErrorReport.make(`${errorPrefix}: path is empty`)
-      : !fs.existsSync(path)
+      : !FS.existsSync(path)
       ? $ErrorReport.make(`${errorPrefix}: path "${path}" does not exist`)
-      : !fs.lstatSync(path).isDirectory()
+      : !FS.lstatSync(path).isDirectory()
       ? $ErrorReport.make(`${errorPrefix}: path "${path}" is not a directory`)
       : undefined;
   },
@@ -66,9 +130,9 @@ export const $FileSystem = {
     const errorPrefix = 'File does not exist';
     return !path
       ? $ErrorReport.make(`${errorPrefix}: path is empty`)
-      : !fs.existsSync(path)
+      : !FS.existsSync(path)
       ? $ErrorReport.make(`${errorPrefix}: path "${path}" does not exist`)
-      : !fs.lstatSync(path).isFile()
+      : !FS.lstatSync(path).isFile()
       ? $ErrorReport.make(`${errorPrefix}: path "${path}" is not a file`)
       : undefined;
   },
@@ -87,6 +151,19 @@ export const $FileSystem = {
       : undefined;
   },
 
+  validateContainsFile: (
+    directoryPath: string,
+    filePath: string,
+  ): ErrorReport | undefined => {
+    const normalizedFilePath = Path.normalize(filePath);
+    const normalizedDirectoryPath = Path.normalize(directoryPath);
+    return normalizedFilePath.startsWith(normalizedDirectoryPath)
+      ? undefined
+      : $ErrorReport.make(
+          `Directory "${normalizedDirectoryPath}" does not contain file "${normalizedFilePath}"`,
+        );
+  },
+
   validateIsValidName: (name: string): ErrorReport | undefined => {
     const errorPrefix = 'Name is not valid';
     return !name
@@ -102,7 +179,7 @@ export const $FileSystem = {
     const errorPrefix = 'Path already exists';
     return !path
       ? $ErrorReport.make(`${errorPrefix}: path is empty`)
-      : fs.existsSync(path)
+      : FS.existsSync(path)
       ? $ErrorReport.make(`${errorPrefix}: path "${path}" already exist`)
       : undefined;
   },

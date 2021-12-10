@@ -25,7 +25,7 @@ export default function RecentProjects(): ReactElement {
 
   const handleOpenRecentProject = useCallback(
     (path: string) => {
-      const error = dispatch(openProject({ directory: path }));
+      const error = dispatch(openProject({ directoryPath: path }));
       if (error) {
         setOpenError(error);
         dispatch(removeRecentProject(path));

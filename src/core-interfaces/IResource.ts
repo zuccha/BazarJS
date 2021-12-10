@@ -173,15 +173,22 @@ export const $IResource = {
         : $EitherErrorOr.value({ ...resource, info });
     };
 
+    /**
+     * Join current directory with given name.
+     *
+     * @param resource Self.
+     * @param name Name of a directory or file.
+     * @returns The path to the directory or file.
+     */
+    const path = (resource: IResource<Info>, name: string): string =>
+      $FileSystem.join(resource.directoryPath, name);
+
     // Return the interface.
     return {
-      Ctor: {
-        create,
-        open,
-      },
-      Dtor: {
-        remove,
-      },
+      create,
+      open,
+      remove,
+      path,
       Instance: {
         getInfo,
         setInfo,

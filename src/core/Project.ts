@@ -28,7 +28,7 @@ export interface Project extends IResource<ProjectInfo> {
 }
 
 const ROM_FILE_NAME = 'rom.smc';
-const LATEST_SNAPSHOT_DIR_NAME = 'latest';
+const LATEST_DIR_NAME = 'latest';
 const BACKUPS_DIR_NAME = 'backups';
 
 export const $Project = {
@@ -53,7 +53,7 @@ export const $Project = {
     let error: ErrorReport | undefined;
 
     const info = { name, author };
-    const resourceOrError = $Resource.Ctor.create(locationDirPath, name, info);
+    const resourceOrError = $Resource.create(locationDirPath, name, info);
     if (resourceOrError.isError) {
       const errorMessage = `${errorPrefix}: failed to create resource`;
       return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
@@ -67,7 +67,7 @@ export const $Project = {
         $FileSystem.join(resource.directoryPath, ROM_FILE_NAME),
       ))
     ) {
-      $Resource.Dtor.remove(resource);
+      $Resource.remove(resource);
       const errorMessage = `${errorPrefix}: failed to copy ROM file`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
@@ -75,22 +75,19 @@ export const $Project = {
     // Create latest snapshot
     const latest = $ProjectSnapshot.create({
       locationDirPath: resource.directoryPath,
-      name: LATEST_SNAPSHOT_DIR_NAME,
+      name: LATEST_DIR_NAME,
     });
     if (latest.isError) {
-      $Resource.Dtor.remove(resource);
+      $Resource.remove(resource);
       const errorMessage = `${errorPrefix}: failed to create latest snapshot`;
       return $EitherErrorOr.error(latest.error.extend(errorMessage));
     }
 
     // Create backups
-    const backupsDirectory = $FileSystem.join(
-      resource.directoryPath,
-      BACKUPS_DIR_NAME,
-    );
+    const backupsDirectory = $Resource.path(resource, BACKUPS_DIR_NAME);
     const backups: ProjectSnapshot[] = [];
     if ((error = $FileSystem.createDirectory(backupsDirectory))) {
-      $Resource.Dtor.remove(resource);
+      $Resource.remove(resource);
       const errorMessage = `${errorPrefix}: failed to create backups directory`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
@@ -103,28 +100,31 @@ export const $Project = {
     });
   },
 
-  open: ({ directory }: { directory: string }): EitherErrorOr<Project> => {
+  open: ({
+    directoryPath,
+  }: {
+    directoryPath: string;
+  }): EitherErrorOr<Project> => {
     const errorPrefix = 'Could not open project';
     let error: ErrorReport | undefined;
 
-    const resourceOrError = $Resource.Ctor.open(directory);
+    const resourceOrError = $Resource.open(directoryPath);
     if (resourceOrError.isError) {
-      const errorMessage = `${errorPrefix}: failed to create info`;
+      const errorMessage = `${errorPrefix}: failed to open project info`;
       return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
     const resource = resourceOrError.value;
 
-    const romFilePath = $FileSystem.join(directory, ROM_FILE_NAME);
+    const romFilePath = $Resource.path(resource, ROM_FILE_NAME);
     if ((error = $FileSystem.validateExistsFile(romFilePath))) {
       const errorMessage = `${errorPrefix}: ROM file does not exist`;
       return $EitherErrorOr.error(error.extend(errorMessage));
     }
 
-    const latestDirectory = $FileSystem.join(
-      directory,
-      LATEST_SNAPSHOT_DIR_NAME,
-    );
-    const latest = $ProjectSnapshot.open({ directory: latestDirectory });
+    const latestDirectoryPath = $Resource.path(resource, LATEST_DIR_NAME);
+    const latest = $ProjectSnapshot.open({
+      directoryPath: latestDirectoryPath,
+    });
     if (latest.isError) {
       const errorMessage = `${errorPrefix}: failed to open latest snapshot`;
       return $EitherErrorOr.error(latest.error.extend(errorMessage));
