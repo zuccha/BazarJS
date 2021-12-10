@@ -91,7 +91,7 @@ export const $FileSystem = {
     const errorPrefix = 'Name is not valid';
     return !name
       ? $ErrorReport.make(`${errorPrefix}: name is empty`)
-      : !/^[a-zA-Z0-9_]+$/.test(name)
+      : !/^[a-zA-Z0-9_.-]+$/.test(name)
       ? $ErrorReport.make(
           `${errorPrefix}: name "${name}" contains invalid characters`,
         )
