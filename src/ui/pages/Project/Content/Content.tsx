@@ -1,5 +1,6 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import useColorScheme from '../../../../theme/useColorScheme';
 import ComingSoon from '../../../../ui-atoms/other/ComingSoon';
 import Patches from './tabs/Patches';
 
@@ -11,6 +12,7 @@ const tabPanelProps = {
 } as const;
 
 export default function Content(): ReactElement {
+  const colorScheme = useColorScheme();
   return (
     <Tabs
       borderWidth={1}
@@ -19,6 +21,7 @@ export default function Content(): ReactElement {
       display='flex'
       flexDir='column'
       defaultIndex={2}
+      colorScheme={colorScheme}
     >
       <TabList>
         <Tab>Blocks</Tab>
