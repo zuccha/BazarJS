@@ -8,7 +8,7 @@ interface DrawerProps {
   title: string;
 }
 
-export default function ConfigEditor({
+export default function Drawer({
   buttons,
   children,
   onClose,
