@@ -27,7 +27,9 @@ export default function Table<T>({
         <Chakra.Thead>
           <Chakra.Tr>
             {columns.map((column) => (
-              <Chakra.Th borderColor='app.bg1'>{column.name}</Chakra.Th>
+              <Chakra.Th key={column.name} borderColor='app.bg1'>
+                {column.name}
+              </Chakra.Th>
             ))}
           </Chakra.Tr>
         </Chakra.Thead>
@@ -49,7 +51,12 @@ export default function Table<T>({
               }}
             >
               {columns.map((column) => (
-                <Chakra.Td borderColor='app.bg1'>{item[column.key]}</Chakra.Td>
+                <Chakra.Td
+                  key={`${getItemKey(item)}-${item[column.key]}`}
+                  borderColor='app.bg1'
+                >
+                  {item[column.key]}
+                </Chakra.Td>
               ))}
             </Chakra.Tr>
           ))}
