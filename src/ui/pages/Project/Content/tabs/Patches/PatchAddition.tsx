@@ -1,8 +1,9 @@
-import { Alert, AlertIcon, Flex, VStack } from '@chakra-ui/react';
+import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../../../store';
 import { addPatchFromDirectory } from '../../../../../../store/slices/core/slices/project';
+import Alert from '../../../../../../ui-atoms/display/Alert';
 import BrowserInput from '../../../../../../ui-atoms/input/BrowserInput';
 import Button from '../../../../../../ui-atoms/input/Button';
 import FormControl, {
@@ -117,7 +118,6 @@ export default function PatchAddition({
           </FormControl>
 
           <Alert status='info'>
-            <AlertIcon />
             The patch will be added to the project, copying the original files.
           </Alert>
         </VStack>

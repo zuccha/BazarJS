@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Flex, VStack } from '@chakra-ui/react';
+import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../../store';
@@ -18,6 +18,7 @@ import {
 } from '../../../../store/slices/settings';
 import Drawer from '../../../../ui-atoms/overlay/Drawer';
 import FormError from '../../../../ui-atoms/input/FormError';
+import Alert from '../../../../ui-atoms/display/Alert';
 
 const { $FileSystem } = window.api;
 
@@ -157,9 +158,9 @@ export default function ProjectCreationFromSource({
           </FormControl>
 
           <Alert status='info'>
-            <AlertIcon />A new directory named after the chosen project name
-            will be created in the selected location, containing a copy of the
-            base ROM and generated files.
+            A new directory named after the chosen project name will be created
+            in the selected location, containing a copy of the base ROM and
+            generated files.
           </Alert>
         </VStack>
 
