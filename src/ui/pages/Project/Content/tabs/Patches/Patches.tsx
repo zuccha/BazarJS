@@ -1,3 +1,4 @@
+import { ArrowForwardIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Flex, HStack } from '@chakra-ui/react';
 import { ReactElement, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,13 +14,25 @@ export default function Content(): ReactElement {
 
   const patches = useSelector(getPatches()) ?? [];
 
+  const actions = useMemo(() => {
+    return [
+      {
+        icon: <ArrowForwardIcon />,
+        tooltip: 'Apply patch',
+        onClick: () => {},
+      },
+      {
+        icon: <EditIcon />,
+        tooltip: 'Open patch in editor',
+        onClick: () => {},
+      },
+      { icon: <DeleteIcon />, tooltip: 'Remove patch', onClick: () => {} },
+    ];
+  }, []);
+
   const items = useMemo(() => {
     return patches.map((patch) => patch.info);
   }, [patches]);
-
-  const [selectedItemIndex, setSelectedItemIndex] = useState<
-    number | undefined
-  >();
 
   return (
     <>
@@ -32,11 +45,10 @@ export default function Content(): ReactElement {
           borderWidth={1}
         >
           <Table
+            actions={actions}
             columns={columns}
             items={items}
             getItemKey={(item) => item.name}
-            onSelectItem={(_, index) => setSelectedItemIndex(index)}
-            selectedItemIndex={selectedItemIndex}
           />
         </Flex>
         <HStack justifyContent='flex-end' mt={2}>

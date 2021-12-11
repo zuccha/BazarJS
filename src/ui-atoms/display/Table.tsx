@@ -1,8 +1,14 @@
 import * as Chakra from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
+import IconButton from '../input/IconButton';
 
 interface TableProps<T> {
+  actions?: readonly {
+    readonly icon: ReactElement;
+    readonly onClick: (item: T) => void;
+    readonly tooltip: string;
+  }[];
   columns: readonly {
     readonly name: string;
     readonly key: keyof T;
@@ -14,6 +20,7 @@ interface TableProps<T> {
 }
 
 export default function Table<T>({
+  actions = [],
   columns,
   getItemKey,
   items,
@@ -31,6 +38,7 @@ export default function Table<T>({
                 {column.name}
               </Chakra.Th>
             ))}
+            {actions.length > 0 && <Chakra.Th borderColor='app.bg1' />}
           </Chakra.Tr>
         </Chakra.Thead>
         <Chakra.Tbody>
@@ -47,7 +55,7 @@ export default function Table<T>({
               }
               _hover={{
                 backgroundColor: 'app.bg2',
-                cursor: 'pointer',
+                cursor: onSelectItem ? 'pointer' : undefined,
               }}
             >
               {columns.map((column) => (
@@ -58,6 +66,22 @@ export default function Table<T>({
                   {item[column.key]}
                 </Chakra.Td>
               ))}
+              {actions.length > 0 && (
+                <Chakra.Td borderColor='app.bg1' w={1}>
+                  <Chakra.HStack>
+                    {actions.map((action) => (
+                      <IconButton
+                        key={`${getItemKey(item)}-${action.tooltip}`}
+                        icon={action.icon}
+                        label={action.tooltip}
+                        onClick={() => action.onClick(item)}
+                        size='sm'
+                        variant='ghost'
+                      />
+                    ))}
+                  </Chakra.HStack>
+                </Chakra.Td>
+              )}
             </Chakra.Tr>
           ))}
         </Chakra.Tbody>
