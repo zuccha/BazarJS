@@ -55,7 +55,7 @@ export default function Content(): ReactElement {
         <Flex
           flexDir='column'
           flex={1}
-          // h='100%'
+          h='100%'
           borderColor='app.bg1'
           borderWidth={1}
         >
