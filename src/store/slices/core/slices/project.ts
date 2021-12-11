@@ -27,6 +27,12 @@ export const reducer = projectSlice.reducer;
 
 export const getProjectInfo = projectApi.createQuery($Project.getInfo);
 export const setProjectInfo = projectApi.createMutation($Project.setInfo);
+
+export const getPatches = projectApi.createQuery($Project.getPatches);
+export const addPatchFromDirectory = projectApi.createQuery(
+  $Project.addPatchFromDirectory,
+);
+
 export const createProjectFromSource = projectApi.createConstructor(
   $Project.createFromSource,
 );

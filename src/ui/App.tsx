@@ -37,8 +37,8 @@ export default function AppNavigation(): ReactElement {
   const Page = PageByAppRouteName[appRoute.name];
 
   return (
-    <Flex height='100%'>
-      <VStack p='3' bg='app.bg1'>
+    <Flex h='100%'>
+      <VStack p='3' bg='app.bg1' overflowY='auto' flexShrink={0}>
         <PageButton
           icon={<DragHandleIcon />}
           label='Home'
@@ -73,6 +73,7 @@ export default function AppNavigation(): ReactElement {
       </VStack>
       <Flex
         flex={1}
+        h='100%'
         bg='app.bg3'
         alignItems='flex-start'
         justifyContent='flex-start'

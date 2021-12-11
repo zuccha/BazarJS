@@ -9,7 +9,6 @@ const { $FileSystem } = window.api;
 
 const PatchInfoSchema = z.object({
   name: z.string(),
-  version: z.string(),
   mainFileRelativePath: z.string(),
 });
 
@@ -25,22 +24,16 @@ const $Resource = $IResource.implement({
 export type Patch = IResource<PatchInfo>;
 
 export const $Patch = {
-  // Inheritance
-
-  ...$Resource.Instance,
-
   // Constructor
 
   createFromDirectory: ({
     locationDirPath,
     name,
-    version,
     sourceDirPath,
     mainFilePath,
   }: {
     locationDirPath: string;
     name: string;
-    version: string;
     sourceDirPath: string;
     mainFilePath: string;
   }): EitherErrorOr<Patch> => {
@@ -53,7 +46,7 @@ export const $Patch = {
       sourceDirPath,
       mainFilePath,
     );
-    const info = { name, version, mainFileRelativePath };
+    const info = { name, mainFileRelativePath };
     const resourceOrError = $Resource.create(locationDirPath, name, info);
     if (resourceOrError.isError) {
       const errorMessage = `${errorPrefix}: failed to create resource`;
@@ -114,4 +107,8 @@ export const $Patch = {
     // Instantiate snapshot
     return $EitherErrorOr.value({ ...resource });
   },
+
+  // Methods
+
+  ...$Resource.inherit<Patch>(),
 };

@@ -149,31 +149,6 @@ export const $IResource = {
     };
 
     /**
-     * Get the info of the resource. The info should be a valid JSON object.
-     *
-     * @param resource Self.
-     * @returns The info of the resource.
-     */
-    const getInfo = (resource: IResource<Info>): Info => resource.info;
-
-    /**
-     * Update the info of a resource.
-     *
-     * @param resource Self.
-     * @param info The new info of the resource.
-     * @returns The updated resource, with the new info.
-     */
-    const setInfo = (
-      resource: IResource<Info>,
-      info: Info,
-    ): EitherErrorOr<IResource<Info>> => {
-      const error = saveInfo(resource.directoryPath, info);
-      return error
-        ? $EitherErrorOr.error(error)
-        : $EitherErrorOr.value({ ...resource, info });
-    };
-
-    /**
      * Join current directory with given name.
      *
      * @param resource Self.
@@ -183,16 +158,40 @@ export const $IResource = {
     const path = (resource: IResource<Info>, name: string): string =>
       $FileSystem.join(resource.directoryPath, name);
 
+    /**
+     * Create instance methods for the resource.
+     */
+    const inherit = <Resource extends IResource<Info>>() => ({
+      /**
+       * Get the info of the resource. The info should be a valid JSON object.
+       *
+       * @param resource Self.
+       * @returns The info of the resource.
+       */
+      getInfo: (resource: Resource): Info => resource.info,
+
+      /**
+       * Update the info of a resource.
+       *
+       * @param resource Self.
+       * @param info The new info of the resource.
+       * @returns The updated resource, with the new info.
+       */
+      setInfo: (resource: Resource, info: Info): EitherErrorOr<Resource> => {
+        const error = saveInfo(resource.directoryPath, info);
+        return error
+          ? $EitherErrorOr.error(error)
+          : $EitherErrorOr.value({ ...resource, info });
+      },
+    });
+
     // Return the interface.
     return {
+      inherit,
       create,
       open,
       remove,
       path,
-      Instance: {
-        getInfo,
-        setInfo,
-      },
     };
   },
 };

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { $IResource, IResource } from '../core-interfaces/IResource';
 import { $DateTime } from '../utils/DateTime';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
-import { ErrorReport } from '../utils/ErrorReport';
+import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 import { $Patch, Patch } from './Patch';
 
 const { $FileSystem } = window.api;
@@ -29,10 +29,6 @@ export interface ProjectSnapshot extends IResource<ProjectSnapshotInfo> {
 const PATCHES_DIR_NAME = 'patches';
 
 export const $ProjectSnapshot = {
-  // Inheritance
-
-  ...$Resource.Instance,
-
   // Constructors
 
   create: ({
@@ -104,5 +100,46 @@ export const $ProjectSnapshot = {
     // Instantiate snapshot
 
     return $EitherErrorOr.value({ ...resource, patches });
+  },
+
+  // Methods
+
+  ...$Resource.inherit<ProjectSnapshot>(),
+
+  getPatches: (snapshot: ProjectSnapshot): Patch[] => snapshot.patches,
+
+  addPatchFromDirectory: (
+    snapshot: ProjectSnapshot,
+    {
+      name,
+      sourceDirPath,
+      mainFilePath,
+    }: {
+      name: string;
+      sourceDirPath: string;
+      mainFilePath: string;
+    },
+  ): EitherErrorOr<ProjectSnapshot> => {
+    const errorPrefix = 'Could not add patch to project snapshot';
+
+    if (snapshot.patches.some((patch) => patch.info.name === name)) {
+      const errorMessage = `${errorPrefix}: patch with name "${name}" already exists`;
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+
+    const patchOrError = $Patch.createFromDirectory({
+      locationDirPath: snapshot.directoryPath,
+      name,
+      sourceDirPath,
+      mainFilePath,
+    });
+    if (patchOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create patch "${name}"`;
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+
+    const patches = [...snapshot.patches, patchOrError.value];
+
+    return $EitherErrorOr.value({ ...snapshot, patches });
   },
 };
