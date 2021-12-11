@@ -52,7 +52,7 @@ export default function Content(): ReactElement {
           />
         </Flex>
         <HStack justifyContent='flex-end' mt={2}>
-          <Button label='Apply all' onClick={() => {}} />
+          <Button label='Apply all' onClick={() => {}} isDisabled />
           <Button label='Add' onClick={() => setPatchAdditionVisible(true)} />
         </HStack>
       </Flex>
