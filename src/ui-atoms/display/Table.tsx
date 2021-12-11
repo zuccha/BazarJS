@@ -32,7 +32,7 @@ export default function Table<T>({
     <Chakra.Box flex={1} overflowY='auto'>
       <Chakra.Table colorScheme={colorScheme} flex={1} overflowY='auto'>
         <Chakra.Thead>
-          <Chakra.Tr>
+          <Chakra.Tr bg='app.bg2'>
             {columns.map((column) => (
               <Chakra.Th key={column.name} borderColor='app.bg1'>
                 {column.name}
@@ -45,6 +45,7 @@ export default function Table<T>({
           {items.map((item, index) => (
             <Chakra.Tr
               key={getItemKey(item)}
+              role='group'
               onClick={() => {
                 onSelectItem?.(item, index);
               }}
@@ -68,7 +69,10 @@ export default function Table<T>({
               ))}
               {actions.length > 0 && (
                 <Chakra.Td borderColor='app.bg1' w={1}>
-                  <Chakra.HStack>
+                  <Chakra.HStack
+                    visibility='hidden'
+                    _groupHover={{ visibility: 'visible' }}
+                  >
                     {actions.map((action) => (
                       <IconButton
                         key={`${getItemKey(item)}-${action.tooltip}`}
