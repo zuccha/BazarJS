@@ -128,7 +128,7 @@ export const $ProjectSnapshot = {
     }
 
     const patchOrError = $Patch.createFromDirectory({
-      locationDirPath: snapshot.directoryPath,
+      locationDirPath: $Resource.path(snapshot, PATCHES_DIR_NAME),
       name,
       sourceDirPath,
       mainFilePath,

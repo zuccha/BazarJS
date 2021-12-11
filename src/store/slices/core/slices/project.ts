@@ -29,7 +29,7 @@ export const getProjectInfo = projectApi.createQuery($Project.getInfo);
 export const setProjectInfo = projectApi.createMutation($Project.setInfo);
 
 export const getPatches = projectApi.createQuery($Project.getPatches);
-export const addPatchFromDirectory = projectApi.createQuery(
+export const addPatchFromDirectory = projectApi.createMutation(
   $Project.addPatchFromDirectory,
 );
 
