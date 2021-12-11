@@ -1,8 +1,13 @@
 import { ArrowForwardIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
-import { Flex, HStack } from '@chakra-ui/react';
+import { Flex, HStack, useToast } from '@chakra-ui/react';
 import { ReactElement, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getPatches } from '../../../../../../store/slices/core/slices/project';
+import { useDispatch, useSelector } from 'react-redux';
+import { PatchInfo } from '../../../../../../core/Patch';
+import { AppDispatch } from '../../../../../../store';
+import {
+  getPatches,
+  removePatch,
+} from '../../../../../../store/slices/core/slices/project';
 import Table from '../../../../../../ui-atoms/display/Table';
 import Button from '../../../../../../ui-atoms/input/Button';
 import PatchAddition from './PatchAddition';
@@ -10,6 +15,8 @@ import PatchAddition from './PatchAddition';
 const columns = [{ name: 'Name', key: 'name' }] as const;
 
 export default function Content(): ReactElement {
+  const dispatch = useDispatch<AppDispatch>();
+  const toast = useToast();
   const [isPatchAdditionVisible, setPatchAdditionVisible] = useState(false);
 
   const patches = useSelector(getPatches()) ?? [];
@@ -26,7 +33,20 @@ export default function Content(): ReactElement {
         tooltip: 'Open patch in editor',
         onClick: () => {},
       },
-      { icon: <DeleteIcon />, tooltip: 'Remove patch', onClick: () => {} },
+      {
+        icon: <DeleteIcon />,
+        tooltip: 'Remove patch',
+        onClick: (patch: PatchInfo) => {
+          const error = dispatch(removePatch(patch.name));
+          if (error) {
+            toast({
+              title: 'Failed to remove patch',
+              description: error.main,
+              status: 'error',
+            });
+          }
+        },
+      },
     ];
   }, []);
 

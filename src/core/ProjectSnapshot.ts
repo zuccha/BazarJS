@@ -106,6 +106,8 @@ export const $ProjectSnapshot = {
 
   ...$Resource.inherit<ProjectSnapshot>(),
 
+  // Patches
+
   getPatches: (snapshot: ProjectSnapshot): Patch[] => snapshot.patches,
 
   addPatchFromDirectory: (
@@ -139,6 +141,34 @@ export const $ProjectSnapshot = {
     }
 
     const patches = [...snapshot.patches, patchOrError.value];
+
+    return $EitherErrorOr.value({ ...snapshot, patches });
+  },
+
+  removePatch: (
+    snapshot: ProjectSnapshot,
+    patchName: string,
+  ): EitherErrorOr<ProjectSnapshot> => {
+    const errorPrefix = 'Could not remove patch from project snapshot';
+
+    const patch = snapshot.patches.find(
+      (patch) => patch.info.name === patchName,
+    );
+
+    if (!patch) {
+      const errorMessage = `${errorPrefix}: patch "${patchName}" does not exist`;
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+
+    const error = $Patch.remove(patch);
+    if (error) {
+      const errorMessage = `${errorPrefix}: failed to remove patch "${patchName}"`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
+
+    const patches = snapshot.patches.filter(
+      (patch) => patch.info.name !== patchName,
+    );
 
     return $EitherErrorOr.value({ ...snapshot, patches });
   },

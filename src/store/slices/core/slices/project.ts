@@ -32,6 +32,7 @@ export const getPatches = projectApi.createQuery($Project.getPatches);
 export const addPatchFromDirectory = projectApi.createMutation(
   $Project.addPatchFromDirectory,
 );
+export const removePatch = projectApi.createMutation($Project.removePatch);
 
 export const createProjectFromSource = projectApi.createConstructor(
   $Project.createFromSource,

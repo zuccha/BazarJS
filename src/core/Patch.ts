@@ -108,6 +108,15 @@ export const $Patch = {
     return $EitherErrorOr.value({ ...resource });
   },
 
+  remove: (patch: Patch): ErrorReport | undefined => {
+    const error = $Resource.remove(patch);
+    if (error) {
+      const errorMessage = 'Could not remove patch: failed to remove resource';
+      return error.extend(errorMessage);
+    }
+    return undefined;
+  },
+
   // Methods
 
   ...$Resource.inherit<Patch>(),

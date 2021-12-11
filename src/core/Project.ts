@@ -140,6 +140,8 @@ export const $Project = {
 
   ...$Resource.inherit<Project>(),
 
+  // Patches
+
   getPatches: (project: Project): Patch[] => {
     return project.latest.patches;
   },
@@ -172,5 +174,23 @@ export const $Project = {
     }
 
     return $EitherErrorOr.value({ ...project, latest: latestOrError.value });
+  },
+
+  removePatch: (
+    project: Project,
+    patchName: string,
+  ): EitherErrorOr<Project> => {
+    const errorPrefix = 'Could not remove patch from project';
+
+    const errorOrSnapshot = $ProjectSnapshot.removePatch(
+      project.latest,
+      patchName,
+    );
+    if (errorOrSnapshot.isError) {
+      const errorMessage = `${errorPrefix}: failed to remove patch "${patchName}"`;
+      return $EitherErrorOr.error(errorOrSnapshot.error.extend(errorMessage));
+    }
+
+    return $EitherErrorOr.value({ ...project, latest: errorOrSnapshot.value });
   },
 };
