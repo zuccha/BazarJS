@@ -1,6 +1,7 @@
 import * as Chakra from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
+import Tooltip from '../overlay/Tooltip';
 
 interface IconButtonProps {
   icon: ReactElement;
@@ -8,6 +9,7 @@ interface IconButtonProps {
   label: string;
   onClick: () => void;
   size?: 'xs' | 'sm' | 'md' | 'lg';
+  tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right';
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
 }
 
@@ -17,18 +19,21 @@ export default function IconButton({
   label,
   onClick,
   size,
+  tooltipPlacement = 'bottom',
   variant = 'solid',
 }: IconButtonProps): ReactElement {
   const colorScheme = useColorScheme();
   return (
-    <Chakra.IconButton
-      aria-label={label}
-      colorScheme={colorScheme}
-      isDisabled={isDisabled}
-      icon={icon}
-      onClick={onClick}
-      size={size}
-      variant={variant}
-    />
+    <Tooltip label={label} placement={tooltipPlacement}>
+      <Chakra.IconButton
+        aria-label={label}
+        colorScheme={colorScheme}
+        isDisabled={isDisabled}
+        icon={icon}
+        onClick={onClick}
+        size={size}
+        variant={variant}
+      />
+    </Tooltip>
   );
 }

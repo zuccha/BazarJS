@@ -14,14 +14,13 @@ export default function PageButton({
   onClick,
 }: PageButtonProps): ReactElement {
   return (
-    <Tooltip label={label} placement='right'>
-      <IconButton
-        label={label}
-        icon={icon}
-        onClick={onClick}
-        size='lg'
-        variant='ghost'
-      />
-    </Tooltip>
+    <IconButton
+      label={label}
+      icon={icon}
+      onClick={onClick}
+      size='lg'
+      tooltipPlacement='right'
+      variant='ghost'
+    />
   );
 }
