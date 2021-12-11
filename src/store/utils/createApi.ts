@@ -16,11 +16,11 @@ export default function createApi<BaseState, State>({
   ) => (dispatch: Dispatch<PayloadAction<State>>) => ErrorReport | undefined {
     return (...args) =>
       (dispatch) => {
-        const mutatedState = create(...args);
-        if (mutatedState.isError) {
-          return mutatedState.error;
+        const errorOrState = create(...args);
+        if (errorOrState.isError) {
+          return errorOrState.error;
         }
-        dispatch({ type: id, payload: mutatedState.value });
+        dispatch({ type: id, payload: errorOrState.value });
         return undefined;
       };
   }

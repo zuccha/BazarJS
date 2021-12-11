@@ -16,11 +16,11 @@ export default function createOptionalApi<BaseState, State>({
   ) => (dispatch: Dispatch<PayloadAction<State>>) => ErrorReport | undefined {
     return (...args) =>
       (dispatch) => {
-        const mutatedState = create(...args);
-        if (mutatedState.isError) {
-          return mutatedState.error;
+        const errorOrState = create(...args);
+        if (errorOrState.isError) {
+          return errorOrState.error;
         }
-        dispatch({ type: id, payload: mutatedState.value });
+        dispatch({ type: id, payload: errorOrState.value });
         return undefined;
       };
   }
@@ -41,11 +41,11 @@ export default function createOptionalApi<BaseState, State>({
           return $ErrorReport.make(errorMessage);
         }
 
-        const mutatedState = mutate(state, ...args);
-        if (mutatedState.isError) {
-          return mutatedState.error;
+        const errorOrMutatedState = mutate(state, ...args);
+        if (errorOrMutatedState.isError) {
+          return errorOrMutatedState.error;
         }
-        dispatch({ type: id, payload: mutatedState.value });
+        dispatch({ type: id, payload: errorOrMutatedState.value });
         return undefined;
       };
   }
