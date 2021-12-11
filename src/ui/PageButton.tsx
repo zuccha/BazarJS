@@ -1,6 +1,5 @@
 import { ReactElement } from 'react';
 import IconButton from '../ui-atoms/input/IconButton';
-import Tooltip from '../ui-atoms/overlay/Tooltip';
 
 interface PageButtonProps {
   icon: ReactElement;
