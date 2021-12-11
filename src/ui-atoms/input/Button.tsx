@@ -1,6 +1,6 @@
 import * as Chakra from '@chakra-ui/react';
 import { LayoutProps, SpaceProps } from '@chakra-ui/react';
-import { ReactElement } from 'react';
+import { forwardRef, ReactElement, Ref } from 'react';
 import useColorScheme from '../../theme/useColorScheme';
 
 interface ButtonProps extends LayoutProps, SpaceProps {
@@ -8,18 +8,29 @@ interface ButtonProps extends LayoutProps, SpaceProps {
   isFullWidth?: boolean;
   label: string;
   onClick: () => void;
+  scheme?: 'normal' | 'destructive';
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
 }
 
-export default function Button({
-  isDisabled,
-  isFullWidth = false,
-  label,
-  onClick,
-  variant = 'solid',
-  ...props
-}: ButtonProps): ReactElement {
-  const colorScheme = useColorScheme();
+function Button(
+  {
+    isDisabled,
+    isFullWidth = false,
+    label,
+    onClick,
+    scheme = 'normal',
+    variant = 'solid',
+    ...props
+  }: ButtonProps,
+  ref: Ref<HTMLButtonElement>,
+): ReactElement {
+  const normalColorScheme = useColorScheme();
+
+  const colorScheme = {
+    normal: normalColorScheme,
+    destructive: 'red',
+  }[scheme];
+
   return (
     <Chakra.Button
       aria-label={label}
@@ -29,6 +40,7 @@ export default function Button({
       isFullWidth={isFullWidth}
       onClick={onClick}
       py={1}
+      ref={ref}
       size='sm'
       variant={variant}
       {...props}
@@ -37,3 +49,5 @@ export default function Button({
     </Chakra.Button>
   );
 }
+
+export default forwardRef(Button);
