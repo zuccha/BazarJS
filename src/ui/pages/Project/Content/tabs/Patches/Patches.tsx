@@ -10,6 +10,7 @@ import {
 } from '../../../../../../store/slices/core/slices/project';
 import Table from '../../../../../../ui-atoms/display/Table';
 import Button from '../../../../../../ui-atoms/input/Button';
+import AlertDelete from '../../../../../../ui-atoms/overlay/AlertDelete';
 import PatchAddition from './PatchAddition';
 
 const columns = [{ name: 'Name', key: 'name' }] as const;
@@ -18,6 +19,7 @@ export default function Content(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const toast = useToast();
   const [isPatchAdditionVisible, setPatchAdditionVisible] = useState(false);
+  const [patchToRemove, setPatchToRemove] = useState<PatchInfo | undefined>();
 
   const patches = useSelector(getPatches()) ?? [];
 
@@ -37,14 +39,7 @@ export default function Content(): ReactElement {
         icon: <DeleteIcon />,
         tooltip: 'Remove patch',
         onClick: (patch: PatchInfo) => {
-          const error = dispatch(removePatch(patch.name));
-          if (error) {
-            toast({
-              title: 'Failed to remove patch',
-              description: error.main,
-              status: 'error',
-            });
-          }
+          setPatchToRemove(patch);
         },
       },
     ];
@@ -79,6 +74,23 @@ export default function Content(): ReactElement {
 
       {isPatchAdditionVisible && (
         <PatchAddition onClose={() => setPatchAdditionVisible(false)} />
+      )}
+
+      {patchToRemove && (
+        <AlertDelete
+          onClose={() => setPatchToRemove(undefined)}
+          onDelete={() => {
+            const error = dispatch(removePatch(patchToRemove.name));
+            if (error) {
+              toast({
+                title: 'Failed to remove patch',
+                description: error.main,
+                status: 'error',
+              });
+            }
+          }}
+          title={`Remove patch "${patchToRemove.name}"`}
+        />
       )}
     </>
   );
