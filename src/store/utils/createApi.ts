@@ -45,6 +45,26 @@ export default function createApi<BaseState, State>({
       };
   }
 
+  function createMutationAsync<Args extends unknown[]>(
+    mutate: (self: State, ...args: Args) => Promise<EitherErrorOr<State>>,
+  ): (
+    ...args: Args
+  ) => (
+    dispatch: Dispatch<PayloadAction<State>>,
+    getState: () => BaseState,
+  ) => Promise<ErrorReport | undefined> {
+    return (...args) =>
+      async (dispatch, getState) => {
+        const state = selectState(getState());
+        const mutatedState = await mutate(state, ...args);
+        if (mutatedState.isError) {
+          return mutatedState.error;
+        }
+        dispatch({ type: id, payload: mutatedState.value });
+        return undefined;
+      };
+  }
+
   function createQuery<Args extends unknown[], Return>(
     query: (self: State, ...args: Args) => Return,
   ): (...args: Args) => (state: BaseState) => Return {
@@ -61,6 +81,7 @@ export default function createApi<BaseState, State>({
     id,
     createConstructor,
     createMutation,
+    createMutationAsync,
     createQuery,
     reduce,
   };
