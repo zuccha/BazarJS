@@ -4,6 +4,7 @@ import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { ErrorReport } from '../utils/ErrorReport';
 import { Patch } from './Patch';
 import { $ProjectSnapshot, ProjectSnapshot } from './ProjectSnapshot';
+import { Toolchain } from './Toolchain';
 
 const { $FileSystem } = window.api;
 
@@ -127,8 +128,14 @@ export const $Project = {
 
   // #region Generic
 
-  openInLunarMagic: (project: Project): EitherErrorOr<Project> => {
-    const errorOrLatest = $ProjectSnapshot.openInLunarMagic(project.latest);
+  openInLunarMagic: (
+    project: Project,
+    toolchain: Toolchain,
+  ): EitherErrorOr<Project> => {
+    const errorOrLatest = $ProjectSnapshot.openInLunarMagic(
+      project.latest,
+      toolchain,
+    );
     if (errorOrLatest.isError) {
       const errorMessage = 'Could not open project in Lunar Magic';
       return $EitherErrorOr.error(errorOrLatest.error.extend(errorMessage));

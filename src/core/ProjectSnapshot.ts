@@ -4,6 +4,7 @@ import { $DateTime } from '../utils/DateTime';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 import { $Patch, Patch } from './Patch';
+import { Toolchain } from './Toolchain';
 
 const { $FileSystem, $Shell } = window.api;
 
@@ -136,9 +137,13 @@ export const $ProjectSnapshot = {
 
   openInLunarMagic: (
     snapshot: ProjectSnapshot,
+    toolchain: Toolchain,
   ): EitherErrorOr<ProjectSnapshot> => {
-    // TODO: Run actual command.
-    const errorOrOutput = $Shell.run('echo', [
+    if (toolchain.embedded.lunarMagic.status !== 'installed') {
+      const errorMessage = 'Lunar Magic is not available';
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+    const errorOrOutput = $Shell.run(toolchain.embedded.lunarMagic.exePath, [
       $Resource.path(snapshot, ROM_FILE_NAME),
     ]);
     if (errorOrOutput.isError) {
