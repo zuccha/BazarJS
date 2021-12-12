@@ -137,7 +137,39 @@ export const $ProjectSnapshot = {
     });
     if (patchOrError.isError) {
       const errorMessage = `${errorPrefix}: failed to create patch "${name}"`;
+      return $EitherErrorOr.error(patchOrError.error.extend(errorMessage));
+    }
+
+    const patches = [...snapshot.patches, patchOrError.value];
+
+    return $EitherErrorOr.value({ ...snapshot, patches });
+  },
+
+  addPatchFromFile: (
+    snapshot: ProjectSnapshot,
+    {
+      name,
+      filePath,
+    }: {
+      name: string;
+      filePath: string;
+    },
+  ): EitherErrorOr<ProjectSnapshot> => {
+    const errorPrefix = 'Could not add patch to project snapshot';
+
+    if (snapshot.patches.some((patch) => patch.info.name === name)) {
+      const errorMessage = `${errorPrefix}: patch with name "${name}" already exists`;
       return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+
+    const patchOrError = $Patch.createFromFile({
+      locationDirPath: $Resource.path(snapshot, PATCHES_DIR_NAME),
+      name,
+      filePath,
+    });
+    if (patchOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create patch "${name}"`;
+      return $EitherErrorOr.error(patchOrError.error.extend(errorMessage));
     }
 
     const patches = [...snapshot.patches, patchOrError.value];

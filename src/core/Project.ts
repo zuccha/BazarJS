@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { $IResource, IResource } from '../core-interfaces/IResource';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
-import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
+import { ErrorReport } from '../utils/ErrorReport';
 import { Patch } from './Patch';
 import { $ProjectSnapshot, ProjectSnapshot } from './ProjectSnapshot';
 
@@ -170,7 +170,31 @@ export const $Project = {
     );
     if (latestOrError.isError) {
       const errorMessage = `${errorPrefix}: failed to create patch "${name}" for latest snapshot`;
-      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+      return $EitherErrorOr.error(latestOrError.error.extend(errorMessage));
+    }
+
+    return $EitherErrorOr.value({ ...project, latest: latestOrError.value });
+  },
+
+  addPatchFromFile: (
+    project: Project,
+    {
+      name,
+      filePath,
+    }: {
+      name: string;
+      filePath: string;
+    },
+  ): EitherErrorOr<Project> => {
+    const errorPrefix = 'Could not add patch to project';
+
+    const latestOrError = $ProjectSnapshot.addPatchFromFile(project.latest, {
+      name,
+      filePath,
+    });
+    if (latestOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create patch "${name}" for latest snapshot`;
+      return $EitherErrorOr.error(latestOrError.error.extend(errorMessage));
     }
 
     return $EitherErrorOr.value({ ...project, latest: latestOrError.value });

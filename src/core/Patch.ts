@@ -90,6 +90,54 @@ export const $Patch = {
     return $EitherErrorOr.value(resource);
   },
 
+  createFromFile: ({
+    locationDirPath,
+    name,
+    filePath,
+  }: {
+    locationDirPath: string;
+    name: string;
+    filePath: string;
+  }): EitherErrorOr<Patch> => {
+    const errorPrefix = 'Could not create patch';
+    let error: ErrorReport | undefined;
+
+    // Resource
+
+    const mainFileRelativePath = $FileSystem.basename(filePath);
+    const info = { name, mainFileRelativePath };
+    const resourceOrError = $Resource.create(locationDirPath, name, info);
+    if (resourceOrError.isError) {
+      const errorMessage = `${errorPrefix}: failed to create resource`;
+      return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
+    }
+    const resource = resourceOrError.value;
+
+    // Validate
+
+    if ((error = $FileSystem.validateExistsFile(filePath))) {
+      $Resource.remove(resource);
+      const errorMessage = `${errorPrefix}: file does not exist`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
+
+    // Copy files
+
+    const mainFilePath = $FileSystem.join(
+      resource.directoryPath,
+      mainFileRelativePath,
+    );
+    if ((error = $FileSystem.copyFile(filePath, mainFilePath))) {
+      $Resource.remove(resource);
+      const errorMessage = `${errorPrefix}: failed to copy patch file`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
+
+    // Instantiate patch
+
+    return $EitherErrorOr.value(resource);
+  },
+
   open: ({
     directoryPath,
   }: {
