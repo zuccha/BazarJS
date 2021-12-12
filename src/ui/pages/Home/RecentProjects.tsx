@@ -1,6 +1,6 @@
 import { Flex, Heading, Text, VStack } from '@chakra-ui/layout';
 import { Box } from '@chakra-ui/react';
-import { ReactElement, useCallback, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../store';
 import { openProject } from '../../../store/slices/core/slices/project';
@@ -44,6 +44,13 @@ export default function RecentProjects(): ReactElement {
     },
     [dispatch],
   );
+
+  useEffect(() => {
+    const recentProjectDirPath = recentProjectDirPaths.items[0];
+    if (recentProjectDirPath) {
+      handleOpenRecentProject(recentProjectDirPath);
+    }
+  }, []);
 
   return (
     <VStack spacing={1} alignItems='flex-start' w='100%'>
