@@ -33,7 +33,7 @@ const LATEST_DIR_NAME = 'latest';
 const BACKUPS_DIR_NAME = 'backups';
 
 export const $Project = {
-  // Constructors
+  // #region Constructors
 
   createFromSource: ({
     name,
@@ -136,11 +136,28 @@ export const $Project = {
     });
   },
 
-  // Methods
+  // #endregion Constructors
+
+  // #region Inheritance
 
   ...$Resource.inherit<Project>(),
 
-  // Patches
+  // #endregion Inheritance
+
+  // #region Generic
+
+  openInLunarMagic: (project: Project): EitherErrorOr<Project> => {
+    const errorOrLatest = $ProjectSnapshot.openInLunarMagic(project.latest);
+    if (errorOrLatest.isError) {
+      const errorMessage = 'Could not open project in Lunar Magic';
+      return $EitherErrorOr.error(errorOrLatest.error.extend(errorMessage));
+    }
+    return $EitherErrorOr.value({ ...project, latest: errorOrLatest.value });
+  },
+
+  // #endregion Generic
+
+  // #region Patches
 
   getPatches: (project: Project): Patch[] => {
     return project.latest.patches;
@@ -217,4 +234,6 @@ export const $Project = {
 
     return $EitherErrorOr.value({ ...project, latest: errorOrSnapshot.value });
   },
+
+  // #endregion Patches
 };

@@ -29,7 +29,7 @@ export interface ProjectSnapshot extends IResource<ProjectSnapshotInfo> {
 const PATCHES_DIR_NAME = 'patches';
 
 export const $ProjectSnapshot = {
-  // Constructors
+  // #region Constructors
 
   create: ({
     locationDirPath,
@@ -102,11 +102,26 @@ export const $ProjectSnapshot = {
     return $EitherErrorOr.value({ ...resource, patches });
   },
 
-  // Methods
+  // #endregion Constructors
+
+  // #region Inheritance
 
   ...$Resource.inherit<ProjectSnapshot>(),
 
-  // Patches
+  // #endregion Inheritance
+
+  // #region Generic
+
+  openInLunarMagic: (
+    snapshot: ProjectSnapshot,
+  ): EitherErrorOr<ProjectSnapshot> => {
+    console.log('TODO: openInLunarMagic');
+    return $EitherErrorOr.value(snapshot);
+  },
+
+  // #endregion Generic
+
+  // #region Patches
 
   getPatches: (snapshot: ProjectSnapshot): Patch[] => snapshot.patches,
 
@@ -204,4 +219,6 @@ export const $ProjectSnapshot = {
 
     return $EitherErrorOr.value({ ...snapshot, patches });
   },
+
+  // #endregion Patches
 };

@@ -25,8 +25,31 @@ const projectSlice = createSlice({
 
 export const reducer = projectSlice.reducer;
 
+// #region Constructors
+
+export const createProjectFromSource = projectApi.createConstructor(
+  $Project.createFromSource,
+);
+export const openProject = projectApi.createConstructor($Project.open);
+
+// #endregion Constructors
+
+// #region Info
+
 export const getProjectInfo = projectApi.createQuery($Project.getInfo);
 export const setProjectInfo = projectApi.createMutation($Project.setInfo);
+
+// #endregion Info
+
+// #region Generics
+
+export const openInLunarMagic = projectApi.createMutation(
+  $Project.openInLunarMagic,
+);
+
+// #endregion Generics
+
+// #region Patches
 
 export const getPatches = projectApi.createQuery($Project.getPatches);
 export const addPatchFromDirectory = projectApi.createMutation(
@@ -37,7 +60,4 @@ export const addPatchFromFile = projectApi.createMutation(
 );
 export const removePatch = projectApi.createMutation($Project.removePatch);
 
-export const createProjectFromSource = projectApi.createConstructor(
-  $Project.createFromSource,
-);
-export const openProject = projectApi.createConstructor($Project.open);
+// #endregion Patches
