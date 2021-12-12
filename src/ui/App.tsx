@@ -41,32 +41,38 @@ export default function AppNavigation(): ReactElement {
       <VStack p='3' bg='app.bg1' overflowY='auto' flexShrink={0}>
         <PageButton
           icon={<DragHandleIcon />}
+          isActive={appRoute.name === AppRouteName.Home}
           label='Home'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Home }))}
         />
         <PageButton
           icon={<CopyIcon />}
+          isActive={appRoute.name === AppRouteName.Project}
           label='Project'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Project }))}
         />
         <PageButton
           icon={<LinkIcon />}
+          isActive={appRoute.name === AppRouteName.Tools}
           label='Tools'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Tools }))}
         />
         <PageButton
           icon={<SettingsIcon />}
+          isActive={appRoute.name === AppRouteName.Settings}
           label='Settings'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Settings }))}
         />
         <Flex flex={1} />
         <PageButton
           icon={<InfoIcon />}
+          isActive={appRoute.name === AppRouteName.About}
           label='About'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.About }))}
         />
         <PageButton
           icon={<QuestionIcon />}
+          isActive={appRoute.name === AppRouteName.Help}
           label='Help'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Help }))}
         />
