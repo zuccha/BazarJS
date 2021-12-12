@@ -55,6 +55,45 @@ const read = ({
   return { status: 'installed', exePath, directoryPath };
 };
 
+const download = async ({
+  directoryName,
+  exeName,
+  version,
+  downloadUrl,
+}: {
+  directoryName: string;
+  exeName: string;
+  version: string;
+  downloadUrl: string;
+}): Promise<EitherErrorOr<ToolEmbedded>> => {
+  let error: ErrorReport | undefined;
+  const directoryPath = $FileSystem.join(TOOLCHAIN_DIR_PATH, directoryName);
+  const versionPath = $FileSystem.join(directoryPath, version);
+  const exePath = $FileSystem.join(versionPath, exeName);
+  const zipPath = $FileSystem.join(directoryPath, `${version}.zip`);
+
+  error = await $FileSystem.downloadFile(zipPath, downloadUrl);
+  if (error) {
+    const errorMessage = 'Failed to download';
+    return $EitherErrorOr.error(error.extend(errorMessage));
+  }
+
+  error = $FileSystem.unzip(zipPath, versionPath);
+  if (error) {
+    $FileSystem.removePath(zipPath);
+    const errorMessage = 'Failed to unzip';
+    return $EitherErrorOr.error(error.extend(errorMessage));
+  }
+
+  $FileSystem.removePath(zipPath);
+
+  return $EitherErrorOr.value({
+    status: 'installed',
+    exePath,
+    directoryPath,
+  });
+};
+
 export const $Toolchain = {
   // #region Constructors
 
@@ -76,41 +115,20 @@ export const $Toolchain = {
   downloadLunarMagic: async (
     toolchain: Toolchain,
   ): Promise<EitherErrorOr<Toolchain>> => {
-    let error: ErrorReport | undefined;
-
     const { lunarMagic } = toolchain;
     if (lunarMagic.status === 'installed') {
       return $EitherErrorOr.value(toolchain);
     }
 
-    const { directoryName, exeName, version, downloadUrl } = LUNAR_MAGIC;
-    const directoryPath = $FileSystem.join(TOOLCHAIN_DIR_PATH, directoryName);
-    const versionPath = $FileSystem.join(directoryPath, version);
-    const exePath = $FileSystem.join(versionPath, exeName);
-    const zipPath = $FileSystem.join(directoryPath, `${version}.zip`);
-
-    error = await $FileSystem.downloadFile(zipPath, downloadUrl);
-    if (error) {
+    const errorOrLunarMagic = await download(LUNAR_MAGIC);
+    if (errorOrLunarMagic.isError) {
       const errorMessage = 'Failed to download Lunar Magic';
-      return $EitherErrorOr.error(error.extend(errorMessage));
+      return $EitherErrorOr.error(errorOrLunarMagic.error.extend(errorMessage));
     }
-
-    error = $FileSystem.unzip(zipPath, versionPath);
-    if (error) {
-      $FileSystem.removePath(zipPath);
-      const errorMessage = 'Failed to unzip Lunar Magic';
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
-    $FileSystem.removePath(zipPath);
 
     return $EitherErrorOr.value({
       ...toolchain,
-      lunarMagic: {
-        status: 'installed',
-        exePath,
-        directoryPath,
-      },
+      lunarMagic: errorOrLunarMagic.value,
     });
   },
 
