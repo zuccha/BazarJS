@@ -7,15 +7,26 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../store';
+import {
+  downloadLunarMagic,
+  getToolchain,
+} from '../../../store/slices/core/slices/toolchain';
 import useColorScheme from '../../../theme/useColorScheme';
 import ToolCustom from './ToolCustom';
 import ToolEmbedded from './ToolEmbedded';
 
 export default function Tools(): ReactElement {
+  const toast = useToast();
   const colorScheme = useColorScheme();
+  const dispatch = useDispatch<AppDispatch>();
+  const toolchain = useSelector(getToolchain());
+
   return (
     <Flex h='100%' w='100%' alignItems='center' justifyContent='center' p={10}>
       <Tabs
@@ -41,8 +52,17 @@ export default function Tools(): ReactElement {
               </Text>
               <ToolEmbedded
                 name='Lunar Magic'
-                onDownload={() => {}}
-                status='not-installed'
+                onDownload={async () => {
+                  const error = await dispatch(downloadLunarMagic());
+                  if (error) {
+                    toast({
+                      title: 'Failed to download Lunar Magic',
+                      description: error.main,
+                      status: 'error',
+                    });
+                  }
+                }}
+                status={toolchain.lunarMagic.status}
               />
               <ToolEmbedded
                 name='Asar'
