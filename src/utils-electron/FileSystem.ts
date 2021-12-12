@@ -1,4 +1,7 @@
+import AdmZip from 'adm-zip';
 import FS from 'fs';
+import HTTPS from 'https';
+import OS from 'os';
 import Path from 'path';
 import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
@@ -74,11 +77,38 @@ export const $FileSystem = {
     }
   },
 
+  downloadFile: async (
+    filePath: string,
+    url: string,
+  ): Promise<ErrorReport | undefined> => {
+    return new Promise((resolve) => {
+      HTTPS.get(url, (response) => {
+        if (response.statusCode !== 200) {
+          resolve($ErrorReport.make(`Failed to download file "${url}"`));
+          return;
+        }
+        FS.mkdirSync(Path.dirname(filePath), { recursive: true });
+        const file = FS.createWriteStream(filePath);
+        response.pipe(file);
+        file.on('finish', () => {
+          file.close();
+          resolve(undefined);
+        });
+      });
+    });
+  },
+
   getDirNames: (directoryPath: string): string[] => {
     const filesAndDirs = FS.readdirSync(directoryPath);
     return filesAndDirs.filter((name) =>
       FS.statSync(Path.join(directoryPath, name)).isDirectory(),
     );
+  },
+
+  getDataDirPath: (): string => {
+    return OS.platform() === 'win32'
+      ? Path.join(`%APPDATA%`, 'Bazar')
+      : Path.join(OS.homedir(), 'Library', 'Application Support', 'Bazar');
   },
 
   getFileNames: (directoryPath: string): string[] => {
@@ -113,6 +143,12 @@ export const $FileSystem = {
     } catch (error) {
       return $ErrorReport.make(`Failed to save JSON file "${path}"`);
     }
+  },
+
+  unzip: (zipPath: string, targetPath: string): ErrorReport | undefined => {
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(targetPath, true);
+    return undefined;
   },
 
   validateExistsDir: (path: string): ErrorReport | undefined => {
