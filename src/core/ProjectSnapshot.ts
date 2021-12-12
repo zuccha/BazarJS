@@ -5,7 +5,7 @@ import { $EitherErrorOr, EitherErrorOr } from '../utils/EitherErrorOr';
 import { $ErrorReport, ErrorReport } from '../utils/ErrorReport';
 import { $Patch, Patch } from './Patch';
 
-const { $FileSystem } = window.api;
+const { $FileSystem, $Shell } = window.api;
 
 // Resource
 
@@ -26,6 +26,7 @@ export interface ProjectSnapshot extends IResource<ProjectSnapshotInfo> {
   patches: Patch[];
 }
 
+const ROM_FILE_NAME = 'rom.smc';
 const PATCHES_DIR_NAME = 'patches';
 
 export const $ProjectSnapshot = {
@@ -33,9 +34,11 @@ export const $ProjectSnapshot = {
 
   create: ({
     locationDirPath,
+    romFilePath,
     name,
   }: {
     locationDirPath: string;
+    romFilePath: string;
     name: string;
   }): EitherErrorOr<ProjectSnapshot> => {
     const errorPrefix = 'Could not create project snapshot';
@@ -50,6 +53,18 @@ export const $ProjectSnapshot = {
       return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
     const resource = resourceOrError.value;
+
+    // Copy ROM file
+    if (
+      (error = $FileSystem.copyFile(
+        romFilePath,
+        $FileSystem.join(resource.directoryPath, ROM_FILE_NAME),
+      ))
+    ) {
+      $Resource.remove(resource);
+      const errorMessage = `${errorPrefix}: failed to copy ROM file`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
 
     // Patches
 
@@ -72,6 +87,7 @@ export const $ProjectSnapshot = {
     directoryPath: string;
   }): EitherErrorOr<ProjectSnapshot> => {
     const errorPrefix = 'Could not open project snapshot';
+    let error: ErrorReport | undefined;
 
     // Resource
 
@@ -81,6 +97,12 @@ export const $ProjectSnapshot = {
       return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
     const resource = resourceOrError.value;
+
+    const romFilePath = $Resource.path(resource, ROM_FILE_NAME);
+    if ((error = $FileSystem.validateExistsFile(romFilePath))) {
+      const errorMessage = `${errorPrefix}: ROM file does not exist`;
+      return $EitherErrorOr.error(error.extend(errorMessage));
+    }
 
     // Patches
 

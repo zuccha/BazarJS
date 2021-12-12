@@ -28,7 +28,6 @@ export interface Project extends IResource<ProjectInfo> {
   backups: ProjectSnapshot[];
 }
 
-const ROM_FILE_NAME = 'rom.smc';
 const LATEST_DIR_NAME = 'latest';
 const BACKUPS_DIR_NAME = 'backups';
 
@@ -57,21 +56,10 @@ export const $Project = {
     }
     const resource = resourceOrError.value;
 
-    // Copy ROM file
-    if (
-      (error = $FileSystem.copyFile(
-        romFilePath,
-        $FileSystem.join(resource.directoryPath, ROM_FILE_NAME),
-      ))
-    ) {
-      $Resource.remove(resource);
-      const errorMessage = `${errorPrefix}: failed to copy ROM file`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
-
     // Create latest snapshot
     const latest = $ProjectSnapshot.create({
       locationDirPath: resource.directoryPath,
+      romFilePath,
       name: LATEST_DIR_NAME,
     });
     if (latest.isError) {
@@ -103,7 +91,6 @@ export const $Project = {
     directoryPath: string;
   }): EitherErrorOr<Project> => {
     const errorPrefix = 'Could not open project';
-    let error: ErrorReport | undefined;
 
     const resourceOrError = $Resource.open(directoryPath);
     if (resourceOrError.isError) {
@@ -111,12 +98,6 @@ export const $Project = {
       return $EitherErrorOr.error(resourceOrError.error.extend(errorMessage));
     }
     const resource = resourceOrError.value;
-
-    const romFilePath = $Resource.path(resource, ROM_FILE_NAME);
-    if ((error = $FileSystem.validateExistsFile(romFilePath))) {
-      const errorMessage = `${errorPrefix}: ROM file does not exist`;
-      return $EitherErrorOr.error(error.extend(errorMessage));
-    }
 
     const latestDirectoryPath = $Resource.path(resource, LATEST_DIR_NAME);
     const latest = $ProjectSnapshot.open({
