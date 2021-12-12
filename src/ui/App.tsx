@@ -9,6 +9,7 @@ import {
 import { Flex, VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { hasProject } from '../store/slices/core/slices/project';
 import {
   AppRouteName,
   selectAppRoute,
@@ -35,6 +36,7 @@ export default function AppNavigation(): ReactElement {
   const appRoute = useSelector(selectAppRoute);
   const dispatch = useDispatch();
   const Page = PageByAppRouteName[appRoute.name];
+  const projectExists = useSelector(hasProject);
 
   return (
     <Flex h='100%'>
@@ -48,6 +50,7 @@ export default function AppNavigation(): ReactElement {
         <PageButton
           icon={<CopyIcon />}
           isActive={appRoute.name === AppRouteName.Project}
+          isDisabled={!projectExists}
           label='Project'
           onClick={() => dispatch(setAppRoute({ name: AppRouteName.Project }))}
         />

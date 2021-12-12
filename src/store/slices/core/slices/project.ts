@@ -25,6 +25,8 @@ const projectSlice = createSlice({
 
 export const reducer = projectSlice.reducer;
 
+export const hasProject = projectApi.exists;
+
 // #region Constructors
 
 export const createProjectFromSource = projectApi.createConstructor(

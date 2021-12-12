@@ -60,6 +60,8 @@ export default function createOptionalApi<BaseState, State>({
       );
   }
 
+  const exists = createSelector(selectState, (self) => !!self);
+
   function reduce(state: State | null, action: PayloadAction<State>) {
     return action.payload;
   }
@@ -69,6 +71,7 @@ export default function createOptionalApi<BaseState, State>({
     createConstructor,
     createMutation,
     createQuery,
+    exists,
     reduce,
   };
 }

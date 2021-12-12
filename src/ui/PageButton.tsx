@@ -3,14 +3,16 @@ import IconButton from '../ui-atoms/input/IconButton';
 
 interface PageButtonProps {
   icon: ReactElement;
-  isActive: boolean;
+  isActive?: boolean;
+  isDisabled?: boolean;
   label: string;
   onClick: () => void;
 }
 
 export default function PageButton({
   icon,
-  isActive,
+  isActive = false,
+  isDisabled = false,
   label,
   onClick,
 }: PageButtonProps): ReactElement {
@@ -18,6 +20,7 @@ export default function PageButton({
     <IconButton
       label={label}
       icon={icon}
+      isDisabled={isDisabled}
       onClick={onClick}
       size='lg'
       tooltipPlacement='right'
