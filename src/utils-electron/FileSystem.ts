@@ -106,8 +106,10 @@ export const $FileSystem = {
   },
 
   getDataDirPath: (): string => {
+    const appdataPath =
+      process.env.APPDATA ?? Path.join(OS.homedir(), 'AppData', 'Roaming');
     return OS.platform() === 'win32'
-      ? Path.join(`%APPDATA%`, 'Bazar')
+      ? Path.join(appdataPath, 'Bazar')
       : Path.join(OS.homedir(), 'Library', 'Application Support', 'Bazar');
   },
 
