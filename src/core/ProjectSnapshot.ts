@@ -137,7 +137,14 @@ export const $ProjectSnapshot = {
   openInLunarMagic: (
     snapshot: ProjectSnapshot,
   ): EitherErrorOr<ProjectSnapshot> => {
-    console.log('TODO: openInLunarMagic');
+    // TODO: Run actual command.
+    const errorOrOutput = $Shell.run('echo', [
+      $Resource.path(snapshot, ROM_FILE_NAME),
+    ]);
+    if (errorOrOutput.isError) {
+      const errorMessage = 'Could not open project snapshot in Lunar Magic';
+      return $EitherErrorOr.error(errorOrOutput.error.extend(errorMessage));
+    }
     return $EitherErrorOr.value(snapshot);
   },
 
