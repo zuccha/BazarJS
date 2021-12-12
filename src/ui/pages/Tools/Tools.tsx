@@ -7,12 +7,9 @@ import {
   TabPanels,
   Tabs,
   Text,
-  useToast,
   VStack,
 } from '@chakra-ui/react';
-import { ReactElement, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../../store';
+import { ReactElement } from 'react';
 import {
   downloadAsar,
   downloadFlips,
@@ -20,55 +17,50 @@ import {
   downloadLunarMagic,
   downloadPixi,
   downloadUberAsm,
-  getToolchain,
 } from '../../../store/slices/core/slices/toolchain';
 import useColorScheme from '../../../theme/useColorScheme';
-import { ErrorReport } from '../../../utils/ErrorReport';
 import ToolCustom from './ToolCustom';
 import ToolEmbedded from './ToolEmbedded';
+import useDownloadToolEmbedded from './useDownloadToolEmbedded';
 
 export default function Tools(): ReactElement {
-  const toast = useToast();
   const colorScheme = useColorScheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const toolchain = useSelector(getToolchain());
 
-  const handleError = useCallback(
-    (name: string) => (error: ErrorReport | undefined) => {
-      if (error) {
-        toast({
-          title: `Failed to download ${name}`,
-          description: error.main,
-          status: 'error',
-        });
-      }
-    },
-    [toast],
-  );
+  const [handleDownloadLunarMagic, lunarMagicStatus] = useDownloadToolEmbedded({
+    name: 'Lunar Magic',
+    key: 'lunarMagic',
+    download: downloadLunarMagic,
+  });
 
-  const handleDownloadLunarMagic = () => {
-    dispatch(downloadLunarMagic()).then(handleError('Lunar Magic'));
-  };
+  const [handleDownloadAsar, asarStatus] = useDownloadToolEmbedded({
+    name: 'Asar',
+    key: 'asar',
+    download: downloadAsar,
+  });
 
-  const handleDownloadAsar = () => {
-    dispatch(downloadAsar()).then(handleError('Asar'));
-  };
+  const [handleDownloadFlips, flipsStatus] = useDownloadToolEmbedded({
+    name: 'Flips',
+    key: 'flips',
+    download: downloadFlips,
+  });
 
-  const handleDownloadFlips = () => {
-    dispatch(downloadFlips()).then(handleError('Flips'));
-  };
+  const [handleDownloadGps, gpsStatus] = useDownloadToolEmbedded({
+    name: 'GPS',
+    key: 'gps',
+    download: downloadGps,
+  });
 
-  const handleDownloadGps = () => {
-    dispatch(downloadGps()).then(handleError('GPS'));
-  };
+  const [handleDownloadPixi, pixiStatus] = useDownloadToolEmbedded({
+    name: 'PIXI',
+    key: 'pixi',
+    download: downloadPixi,
+  });
 
-  const handleDownloadPixi = () => {
-    dispatch(downloadPixi()).then(handleError('PIXI'));
-  };
-
-  const handleDownloadUberAsm = () => {
-    dispatch(downloadUberAsm()).then(handleError('UberASM'));
-  };
+  const [handleDownloadUberAsm, uberAsmStatus] = useDownloadToolEmbedded({
+    name: 'UberASM',
+    key: 'uberAsm',
+    download: downloadUberAsm,
+  });
 
   return (
     <Flex h='100%' w='100%' alignItems='center' justifyContent='center' p={10}>
@@ -96,32 +88,32 @@ export default function Tools(): ReactElement {
               <ToolEmbedded
                 name='Lunar Magic'
                 onDownload={handleDownloadLunarMagic}
-                status={toolchain.embedded.lunarMagic.status}
+                status={lunarMagicStatus}
               />
               <ToolEmbedded
                 name='Asar'
                 onDownload={handleDownloadAsar}
-                status={toolchain.embedded.asar.status}
+                status={asarStatus}
               />
               <ToolEmbedded
                 name='Flips'
                 onDownload={handleDownloadFlips}
-                status={toolchain.embedded.flips.status}
+                status={flipsStatus}
               />
               <ToolEmbedded
                 name='GPS'
                 onDownload={handleDownloadGps}
-                status={toolchain.embedded.gps.status}
+                status={gpsStatus}
               />
               <ToolEmbedded
                 name='PIXI'
                 onDownload={handleDownloadPixi}
-                status={toolchain.embedded.pixi.status}
+                status={pixiStatus}
               />
               <ToolEmbedded
                 name='UberASM'
                 onDownload={handleDownloadUberAsm}
-                status={toolchain.embedded.uberAsm.status}
+                status={uberAsmStatus}
               />
             </VStack>
           </TabPanel>
