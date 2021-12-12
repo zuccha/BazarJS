@@ -10,14 +10,20 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { ReactElement } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../store';
 import {
+  downloadAsar,
+  downloadFlips,
+  downloadGps,
   downloadLunarMagic,
+  downloadPixi,
+  downloadUberAsm,
   getToolchain,
 } from '../../../store/slices/core/slices/toolchain';
 import useColorScheme from '../../../theme/useColorScheme';
+import { ErrorReport } from '../../../utils/ErrorReport';
 import ToolCustom from './ToolCustom';
 import ToolEmbedded from './ToolEmbedded';
 
@@ -26,6 +32,43 @@ export default function Tools(): ReactElement {
   const colorScheme = useColorScheme();
   const dispatch = useDispatch<AppDispatch>();
   const toolchain = useSelector(getToolchain());
+
+  const handleError = useCallback(
+    (name: string) => (error: ErrorReport | undefined) => {
+      if (error) {
+        toast({
+          title: `Failed to download ${name}`,
+          description: error.main,
+          status: 'error',
+        });
+      }
+    },
+    [toast],
+  );
+
+  const handleDownloadLunarMagic = () => {
+    dispatch(downloadLunarMagic()).then(handleError('Lunar Magic'));
+  };
+
+  const handleDownloadAsar = () => {
+    dispatch(downloadAsar()).then(handleError('Asar'));
+  };
+
+  const handleDownloadFlips = () => {
+    dispatch(downloadFlips()).then(handleError('Flips'));
+  };
+
+  const handleDownloadGps = () => {
+    dispatch(downloadGps()).then(handleError('GPS'));
+  };
+
+  const handleDownloadPixi = () => {
+    dispatch(downloadPixi()).then(handleError('PIXI'));
+  };
+
+  const handleDownloadUberAsm = () => {
+    dispatch(downloadUberAsm()).then(handleError('UberASM'));
+  };
 
   return (
     <Flex h='100%' w='100%' alignItems='center' justifyContent='center' p={10}>
@@ -52,42 +95,33 @@ export default function Tools(): ReactElement {
               </Text>
               <ToolEmbedded
                 name='Lunar Magic'
-                onDownload={async () => {
-                  const error = await dispatch(downloadLunarMagic());
-                  if (error) {
-                    toast({
-                      title: 'Failed to download Lunar Magic',
-                      description: error.main,
-                      status: 'error',
-                    });
-                  }
-                }}
-                status={toolchain.lunarMagic.status}
+                onDownload={handleDownloadLunarMagic}
+                status={toolchain.embedded.lunarMagic.status}
               />
               <ToolEmbedded
                 name='Asar'
-                onDownload={() => {}}
-                status='not-installed'
+                onDownload={handleDownloadAsar}
+                status={toolchain.embedded.asar.status}
               />
               <ToolEmbedded
                 name='Flips'
-                onDownload={() => {}}
-                status='not-installed'
+                onDownload={handleDownloadFlips}
+                status={toolchain.embedded.flips.status}
               />
               <ToolEmbedded
                 name='GPS'
-                onDownload={() => {}}
-                status='installed'
+                onDownload={handleDownloadGps}
+                status={toolchain.embedded.gps.status}
               />
               <ToolEmbedded
                 name='PIXI'
-                onDownload={() => {}}
-                status='not-installed'
+                onDownload={handleDownloadPixi}
+                status={toolchain.embedded.pixi.status}
               />
               <ToolEmbedded
                 name='UberASM'
-                onDownload={() => {}}
-                status='downloading'
+                onDownload={handleDownloadUberAsm}
+                status={toolchain.embedded.uberAsm.status}
               />
             </VStack>
           </TabPanel>

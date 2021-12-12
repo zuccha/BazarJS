@@ -31,7 +31,7 @@ export const getToolchain = toolchainApi.createQuery((toolchain) => toolchain);
 
 // #endregion Generics
 
-// #region Patches
+// #region Embedded
 
 export const readLunarMagic = toolchainApi.createMutation(
   $Toolchain.readLunarMagic,
@@ -40,4 +40,29 @@ export const downloadLunarMagic = toolchainApi.createMutationAsync(
   $Toolchain.downloadLunarMagic,
 );
 
-// #endregion Patches
+export const readAsar = toolchainApi.createMutation($Toolchain.readAsar);
+export const downloadAsar = toolchainApi.createMutationAsync(
+  $Toolchain.downloadAsar,
+);
+
+export const readFlips = toolchainApi.createMutation($Toolchain.readFlips);
+export const downloadFlips = toolchainApi.createMutationAsync(
+  $Toolchain.downloadFlips,
+);
+
+export const readGps = toolchainApi.createMutation($Toolchain.readGps);
+export const downloadGps = toolchainApi.createMutationAsync(
+  $Toolchain.downloadGps,
+);
+
+export const readPixi = toolchainApi.createMutation($Toolchain.readPixi);
+export const downloadPixi = toolchainApi.createMutationAsync(
+  $Toolchain.downloadPixi,
+);
+
+export const readUberAsm = toolchainApi.createMutation($Toolchain.readUberAsm);
+export const downloadUberAsm = toolchainApi.createMutationAsync(
+  $Toolchain.downloadUberAsm,
+);
+
+// #endregion Embedded
