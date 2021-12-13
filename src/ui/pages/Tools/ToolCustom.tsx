@@ -28,10 +28,10 @@ export default function ToolCustom({
   }, [onChoose]);
 
   return (
-    <Flex w='100%' h='60px' alignItems='center'>
+    <Flex w='100%' minH='60px' alignItems='center'>
       <Flex flexDir='column' flex={1}>
         <Heading size='sm'>{name}</Heading>
-        <Text size='sm' fontStyle='italic'>
+        <Text size='sm' fontStyle='italic' maxW={400}>
           {exePath || '<Not specified>'}
         </Text>
       </Flex>
