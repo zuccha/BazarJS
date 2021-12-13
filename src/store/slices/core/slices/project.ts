@@ -49,6 +49,10 @@ export const openInLunarMagic = projectApi.createMutation(
   $Project.openInLunarMagic,
 );
 
+export const launchInEmulator = projectApi.createMutation(
+  $Project.launchInEmulator,
+);
+
 // #endregion Generics
 
 // #region Patches

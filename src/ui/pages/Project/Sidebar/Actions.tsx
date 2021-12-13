@@ -1,15 +1,20 @@
-import { useToast, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import useHandleError from '../../../../hooks/useHandleError';
 import { AppDispatch } from '../../../../store';
-import { openInLunarMagic } from '../../../../store/slices/core/slices/project';
+import {
+  launchInEmulator,
+  openInLunarMagic,
+} from '../../../../store/slices/core/slices/project';
 import { getToolchain } from '../../../../store/slices/core/slices/toolchain';
 import Button from '../../../../ui-atoms/input/Button';
 
 export default function Actions(): ReactElement {
-  const toast = useToast();
   const dispatch = useDispatch<AppDispatch>();
   const toolchain = useSelector(getToolchain());
+  const handleError = useHandleError();
+
   return (
     <VStack w='100%'>
       <Button
@@ -17,21 +22,18 @@ export default function Actions(): ReactElement {
         label='Open in Lunar Magic'
         onClick={() => {
           const error = dispatch(openInLunarMagic(toolchain));
-          if (error) {
-            toast({
-              title: 'Failed to open in Lunar Magic',
-              description: error.main,
-              status: 'error',
-            });
-          }
+          handleError(error, 'Failed to open in Lunar Magic');
         }}
         w='100%'
       />
       <Button
+        isDisabled={!toolchain.custom.emulator.exePath}
         label='Run on emulator'
-        onClick={() => null}
+        onClick={() => {
+          const error = dispatch(launchInEmulator(toolchain));
+          handleError(error, 'Failed to open in Lunar Magic');
+        }}
         w='100%'
-        isDisabled
       />
       <Button label='Backup' onClick={() => null} w='100%' isDisabled />
       <Button label='Create BPS' onClick={() => null} w='100%' isDisabled />

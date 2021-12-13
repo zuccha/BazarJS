@@ -153,6 +153,24 @@ export const $ProjectSnapshot = {
     return $EitherErrorOr.value(snapshot);
   },
 
+  launchInEmulator: (
+    snapshot: ProjectSnapshot,
+    toolchain: Toolchain,
+  ): EitherErrorOr<ProjectSnapshot> => {
+    if (!toolchain.custom.emulator.exePath) {
+      const errorMessage = 'Emulator is not available';
+      return $EitherErrorOr.error($ErrorReport.make(errorMessage));
+    }
+    const errorOrOutput = $Shell.run(toolchain.custom.emulator.exePath, [
+      $Resource.path(snapshot, ROM_FILE_NAME),
+    ]);
+    if (errorOrOutput.isError) {
+      const errorMessage = 'Could not launch project snapshot in emulator';
+      return $EitherErrorOr.error(errorOrOutput.error.extend(errorMessage));
+    }
+    return $EitherErrorOr.value(snapshot);
+  },
+
   // #endregion Generic
 
   // #region Patches

@@ -143,6 +143,21 @@ export const $Project = {
     return $EitherErrorOr.value({ ...project, latest: errorOrLatest.value });
   },
 
+  launchInEmulator: (
+    project: Project,
+    toolchain: Toolchain,
+  ): EitherErrorOr<Project> => {
+    const errorOrLatest = $ProjectSnapshot.launchInEmulator(
+      project.latest,
+      toolchain,
+    );
+    if (errorOrLatest.isError) {
+      const errorMessage = 'Could not launch project in emulator';
+      return $EitherErrorOr.error(errorOrLatest.error.extend(errorMessage));
+    }
+    return $EitherErrorOr.value({ ...project, latest: errorOrLatest.value });
+  },
+
   // #endregion Generic
 
   // #region Patches
