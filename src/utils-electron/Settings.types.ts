@@ -7,6 +7,8 @@ export enum Setting {
   PatchAskConfirmationBeforeApply = 'AskConfirmationBeforeApplyingPatch',
   RecentProjects = 'RecentProjects',
   RecentProjectsMaxCount = 'RecentProjectsMaxCount',
+  ToolEditorExePath = 'ToolEditorExePath',
+  ToolEmulatorExePath = 'ToolEmulatorExePath',
 }
 
 export type SettingsStore = {
@@ -16,4 +18,6 @@ export type SettingsStore = {
   [Setting.PatchAskConfirmationBeforeApply]: boolean;
   [Setting.RecentProjects]: PriorityList<string>;
   [Setting.RecentProjectsMaxCount]: number;
+  [Setting.ToolEditorExePath]: string;
+  [Setting.ToolEmulatorExePath]: string;
 };

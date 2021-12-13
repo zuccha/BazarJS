@@ -5,7 +5,7 @@ import Button from '../../../ui-atoms/input/Button';
 const { $Dialog } = window.api;
 
 interface ToolCustomProps {
-  exePath?: string;
+  exePath: string;
   name: string;
   onChoose: (exePath: string) => void;
 }
@@ -32,7 +32,7 @@ export default function ToolCustom({
       <Flex flexDir='column' flex={1}>
         <Heading size='sm'>{name}</Heading>
         <Text size='sm' fontStyle='italic'>
-          {exePath ?? '<Not specified>'}
+          {exePath || '<Not specified>'}
         </Text>
       </Flex>
       <Button label='Browse...' onClick={handleBrowse} variant='outline' />

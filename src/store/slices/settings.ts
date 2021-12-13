@@ -4,16 +4,23 @@ import { Setting, SettingsStore } from '../../utils-electron/Settings.types';
 import { ErrorReport } from '../../utils/ErrorReport';
 import { $PriorityList } from '../../utils/PriorityList';
 
-type SettingsState = SettingsStore;
+type SettingsState = Omit<
+  SettingsStore,
+  // These settings are handled by the toolchain
+  Setting.ToolEditorExePath | Setting.ToolEmulatorExePath
+>;
+
+type LocalSetting = keyof SettingsState;
+
 type AppState = { settings: SettingsState };
 
 const { $Settings } = window.api;
 
 // Types
 
-type SetSettingActionPayload<S extends Setting> = PayloadAction<{
+type SetSettingActionPayload<S extends LocalSetting> = PayloadAction<{
   key: S;
-  value: SettingsStore[S];
+  value: SettingsState[S];
 }>;
 
 const SetSettingActionType = 'settings/set';
@@ -21,14 +28,14 @@ const SetSettingActionType = 'settings/set';
 // Selectors
 
 export const getSetting =
-  <S extends Setting>(key: S) =>
-  (state: AppState): SettingsStore[S] =>
+  <S extends LocalSetting>(key: S) =>
+  (state: AppState): SettingsState[S] =>
     state.settings[key];
 
 // Thunks
 
 export const setSetting =
-  <S extends Setting>(key: S, value: SettingsStore[S]) =>
+  <S extends LocalSetting>(key: S, value: SettingsStore[S]) =>
   (dispatch: Dispatch<SetSettingActionPayload<S>>): ErrorReport | undefined => {
     const error = $Settings.set(key, value);
     if (!error) {
@@ -97,7 +104,7 @@ const settingsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [SetSettingActionType]: <S extends Setting>(
+    [SetSettingActionType]: <S extends LocalSetting>(
       state: SettingsState,
       action: SetSettingActionPayload<S>,
     ) => {

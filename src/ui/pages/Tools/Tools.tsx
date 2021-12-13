@@ -10,6 +10,8 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../../store';
 import {
   downloadAsar,
   downloadFlips,
@@ -17,6 +19,9 @@ import {
   downloadLunarMagic,
   downloadPixi,
   downloadUberAsm,
+  getToolchain,
+  setEditor,
+  setEmulator,
 } from '../../../store/slices/core/slices/toolchain';
 import useColorScheme from '../../../theme/useColorScheme';
 import ToolCustom from './ToolCustom';
@@ -25,6 +30,8 @@ import useDownloadToolEmbedded from './useDownloadToolEmbedded';
 
 export default function Tools(): ReactElement {
   const colorScheme = useColorScheme();
+  const dispatch = useDispatch<AppDispatch>();
+  const toolchain = useSelector(getToolchain());
 
   const [handleDownloadLunarMagic, lunarMagicStatus] = useDownloadToolEmbedded({
     name: 'Lunar Magic',
@@ -125,14 +132,14 @@ export default function Tools(): ReactElement {
                 blocks). The emulator will be used to run the game.
               </Text>
               <ToolCustom
-                exePath='/path/to/exe'
+                exePath={toolchain.custom.editor.exePath}
                 name='Editor'
-                onChoose={() => {}}
+                onChoose={(exePath) => dispatch(setEditor(exePath))}
               />
               <ToolCustom
-                exePath={undefined}
+                exePath={toolchain.custom.emulator.exePath}
                 name='Emulator'
-                onChoose={() => {}}
+                onChoose={(exePath) => dispatch(setEmulator(exePath))}
               />
             </VStack>
           </TabPanel>

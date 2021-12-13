@@ -31,6 +31,14 @@ export const getToolchain = toolchainApi.createQuery((toolchain) => toolchain);
 
 // #endregion Generics
 
+// #region Custom
+
+export const setEditor = toolchainApi.createMutation($Toolchain.setEditor);
+
+export const setEmulator = toolchainApi.createMutation($Toolchain.setEmulator);
+
+// #endregion Custom
+
 // #region Embedded
 
 export const readLunarMagic = toolchainApi.createMutation(
