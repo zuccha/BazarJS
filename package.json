@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-typescript",
-  "author": "Diego Fernandes <diego.schell.f@gmail.com>",
-  "version": "2.0.0",
+  "name": "Bazar",
+  "author": "Amedeo Zucchetti <amedeo.zucchetti@gmail.com>",
+  "version": "1.0.0",
   "description": "A tool for hacking Super Mario World",
   "main": "./.webpack/main/index.js",
   "scripts": {
