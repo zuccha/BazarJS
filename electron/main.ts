@@ -29,6 +29,10 @@ function createWindow() {
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  if (app.isPackaged) {
+    mainWindow.removeMenu();
+  }
+
   mainWindow.show();
 
   mainWindow.on('closed', () => {
