@@ -1,7 +1,7 @@
 module.exports = {
   packagerConfig: {
     name: 'Bazar',
-    executableName: 'electron-starter',
+    executableName: 'Bazar',
     icon: 'assets/icon',
     extraResource: ['assets'],
   },
