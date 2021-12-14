@@ -8,6 +8,7 @@ import {
   getPatches,
   removePatch,
 } from '../../../../../../store/slices/core/slices/project';
+import Output from '../../../../../../ui-atoms/display/Output';
 import Table from '../../../../../../ui-atoms/display/Table';
 import Button from '../../../../../../ui-atoms/input/Button';
 import AlertDelete from '../../../../../../ui-atoms/overlay/AlertDelete';
@@ -51,25 +52,30 @@ export default function Content(): ReactElement {
 
   return (
     <>
-      <Flex flexDir='column' flex={1} h='100%' w={512}>
-        <Flex
-          flexDir='column'
-          flex={1}
-          h='100%'
-          borderColor='app.bg1'
-          borderWidth={1}
-        >
-          <Table
-            actions={actions}
-            columns={columns}
-            items={items}
-            getItemKey={(item) => item.name}
-          />
+      <Flex h='100%'>
+        <Flex flexDir='column' h='100%' w={512}>
+          <Flex
+            flexDir='column'
+            flex={1}
+            h='100%'
+            borderColor='app.bg1'
+            borderWidth={1}
+          >
+            <Table
+              actions={actions}
+              columns={columns}
+              items={items}
+              getItemKey={(item) => item.name}
+            />
+          </Flex>
+          <HStack justifyContent='flex-end' mt={2}>
+            <Button label='Apply all' onClick={() => {}} isDisabled />
+            <Button label='Add' onClick={() => setPatchAdditionVisible(true)} />
+          </HStack>
         </Flex>
-        <HStack justifyContent='flex-end' mt={2}>
-          <Button label='Apply all' onClick={() => {}} isDisabled />
-          <Button label='Add' onClick={() => setPatchAdditionVisible(true)} />
-        </HStack>
+        <Flex w={512} h='100%' ml={3} flexDir='column' borderColor='app.bg1'>
+          <Output output='' />
+        </Flex>
       </Flex>
 
       {isPatchAdditionVisible && (
